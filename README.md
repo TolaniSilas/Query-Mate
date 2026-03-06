@@ -1,2 +1,3 @@
-# Query-Mate
-Develop an intelligent database querying system that enables users (most especially non-technical users - for instance, stakeholders) to interact with their relational databases using natural language instead of SQL syntax. The system capitalizes on the impressive capabilities of Large Language Models (LLMs)
+# Query Mate: Chat With Your Database
+
+The aim of this project is to develop an intelligent database querying system that enables users (most especially non-technical users - for instance, stakeholders) to interact with their relational databases using natural language instead of SQL syntax. The system capitalizes on the impressive capabilities of Large Language Models (LLMs) to translate user questions into SQL queries and format database responses in human-readable language. Handling of databases with a large number of tables and security concerns or measures about database credentials are enforced and highly considered in this project implementation."
