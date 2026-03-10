@@ -1,0 +1,11 @@
+[project]
+name = "query-mate"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.12.5",
+    "sqlalchemy>=2.0.48",
+]
