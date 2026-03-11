@@ -4,21 +4,18 @@ this is SEPARATE from query_validator.py (which is a security gate).
 this agent's job is semantic: "does this SQL query actually answer the question?"
 
 it checks:
-    1. semantic alignment - does the SQL answer what was asked?
-    2. Schema correctness - are the tables/columns real and used correctly?
-    3. JOIN completeness - are relationships properly joined?
-    4. Logic sanity - right aggregations, filters, orderings?
+    1. semantic alignment  - does the SQL answer what was asked?
+    2. schema correctness  - are the tables/columns real and used correctly?
+    3. JOIN completeness   - are relationships properly joined?
+    4. logic sanity        - right aggregations, filters, orderings?
 
 if it rejects, it returns specific feedback so the SQL Agent can self-correct.
 """
 
 import os
-from anthropic import Anthropic
+from core.llm import chat
 from core.logger import get_logger
 
-
-# initialise the Anthropic client — API key is loaded from the environment, never hardcoded
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 logger = get_logger(__name__)
 
@@ -80,7 +77,7 @@ FEEDBACK: <if FAIL — one specific, actionable instruction telling the SQL Agen
 """
 
 
-def validate(question: str, sql: str, schema_prompt: str) -> dict:
+def validator_agent(question: str, sql: str, schema_prompt: str) -> dict:
     """
     validates whether the generated sql correctly answers the user's question.
 
@@ -95,7 +92,7 @@ def validate(question: str, sql: str, schema_prompt: str) -> dict:
     {
         "status":   "ok" | "rejected" | "error",
         "reason":   str,
-        "feedback": str | None   # only populated on rejection, sent back to SQL Agent
+        "feedback": str | None
     }
     """
     system_prompt = _build_validator_prompt(schema_prompt)
@@ -111,16 +108,14 @@ Is this SQL correct and complete for the question?"""
     logger.debug("validator | sql to validate:\n%s", sql)
 
     try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=512,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_content}],
+        raw = chat(
+            system     = system_prompt,
+            user       = user_content,
+            max_tokens = 512,
+            provider   = "anthropic",
+            model      = "claude-sonnet-4-20250514",
         )
 
-        raw = response.content[0].text.strip()
-
-        # parse the structured response
         verdict  = _extract_field(raw, "VERDICT")
         reason   = _extract_field(raw, "REASON")
         feedback = _extract_field(raw, "FEEDBACK")
@@ -141,8 +136,7 @@ Is this SQL correct and complete for the question?"""
             }
 
     except Exception as e:
-
-        # validator is unavailable - log the error so it can be investigated in production.
+        # validator is unavailable — log the error so it can be investigated in production
         logger.error("validator | API error — validator unavailable: %s", str(e), exc_info=True)
         return {
             "status":   "error",
@@ -152,12 +146,8 @@ Is this SQL correct and complete for the question?"""
 
 
 def _extract_field(text: str, field: str) -> str | None:
-    """
-    extracts "FIELD: value" from the LLM response.
-    """
-
+    # extracts "FIELD: value" from the LLM response
     for line in text.splitlines():
         if line.strip().upper().startswith(f"{field}:"):
             return line.split(":", 1)[1].strip()
-        
     return None

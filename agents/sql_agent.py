@@ -3,17 +3,14 @@ this converts a natural language question into a sql query using the LLM.
 and accepts feedback from the validator agent and retries if needed.
 """
 
-
 import os
 import re
-from anthropic import Anthropic
+from core.llm import chat
 from core.logger import get_logger
 
 
-# initialise the Anthropic client — API key is loaded from the environment, never hardcoded
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
-logger     = get_logger(__name__)
+logger      = get_logger(__name__)
 max_retries = 3
 
 
@@ -71,7 +68,7 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
     returns
     -------
     {
-        "sql":    str | None,   # the generated SQL, or None if unanswerable
+        "sql":    str | None,
         "status": "ok" | "cannot_answer" | "error",
         "error":  str | None
     }
@@ -89,14 +86,13 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
         )
 
     try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1024,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_content}],
+        raw_text = chat(
+            system     = system_prompt,
+            user       = user_content,
+            max_tokens = 1024,
+            provider   = "anthropic",
+            model      = "claude-sonnet-4-20250514",
         )
-
-        raw_text = response.content[0].text.strip()
 
         if "CANNOT_ANSWER" in raw_text.upper():
             logger.info("sql_agent | CANNOT_ANSWER | question: %s", question)
@@ -124,17 +120,17 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
     question      : user's natural language question
     schema_prompt : schema context string
     db_type       : database dialect
-    validator_fn  : validator_agent.validate(question, sql, schema_prompt) → dict
+    validator_fn  : validator_agent.validate(question, sql, schema_prompt) -> dict
     executor_fn   : executes SQL, returns {"rows": [...], "error": str | None}
 
     returns
     -------
     {
-        "sql":        str | None,
-        "rows":       list | None,
-        "status":     "ok" | "cannot_answer" | "validation_failed" | "error",
-        "attempts":   int,
-        "error":      str | None,
+        "sql":      str | None,
+        "rows":     list | None,
+        "status":   "ok" | "cannot_answer" | "validation_failed" | "error",
+        "attempts": int,
+        "error":    str | None,
     }
     """
 
@@ -147,7 +143,6 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
 
         logger.info("sql_agent | attempt %d of %d", attempt, max_retries)
 
-        # Step 1: generate SQL (pass feedback on retries)
         gen_result = generate_sql(question, schema_prompt, db_type, feedback)
 
         if gen_result["status"] == "cannot_answer":
@@ -172,16 +167,15 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
 
         sql = gen_result["sql"]
 
-        # Step 2: validate — quality + intent check (LLM-based)
+        # validate — quality + intent check (LLM-based)
         val_result = validator_fn(question, sql, schema_prompt)
 
         if val_result["status"] == "ok":
-            # Step 3: execute the validated SQL
             exec_result = executor_fn(sql)
 
             if exec_result.get("error"):
                 # execution failed; treat the DB error as feedback and retry.
-                feedback = f"The SQL caused a database error: {exec_result['error']}"
+                feedback   = f"The SQL caused a database error: {exec_result['error']}"
                 last_error = exec_result["error"]
                 logger.warning("sql_agent | execution error on attempt %d: %s", attempt, last_error)
                 continue

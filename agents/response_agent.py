@@ -5,12 +5,9 @@ the LLM synthesises the data into insight - never lists rows or exposes sql.
 
 import os
 import json
-from anthropic import Anthropic
+from core.llm import chat
 from core.logger import get_logger
 
-
-# initialise the anthropic client.
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 logger = get_logger(__name__)
 
@@ -105,17 +102,18 @@ def generate_response(question: str, sql: str, rows: list | None, status: str,
     )
 
     try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1024,
-            system=_build_system_prompt(),
-            messages=[{"role": "user", "content": user_content}],
+        answer = chat(
+            system     = _build_system_prompt(),
+            user       = user_content,
+            max_tokens = 1024,
+            provider   = "anthropic",
+            model      = "claude-sonnet-4-20250514",
         )
 
         logger.debug("response_agent | answer generated successfully")
 
         return {
-            "answer":    response.content[0].text.strip(),
+            "answer":    answer,
             "row_count": row_count,
             "truncated": truncated,
             "status":    "ok",
