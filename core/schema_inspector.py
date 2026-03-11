@@ -107,9 +107,98 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
     return schema
 
 
+
+def build_llm_prompt(schema: dict) -> str:
+    # renders each table as a CREATE TABLE statement + sample rows block.
+    # this format is far more readable (eventually better) for LLMs compared to the raw JSON/dict output.
+    blocks = []
+
+    for table_name, table_info in schema["tables"].items():
+        col_lines    = []
+        constraint_lines = []
+
+        for col_name, col in table_info["columns"].items():
+            # build the column definition line
+            parts = [f"\t{col_name}", col["type"]]
+
+            if not col["nullable"]:
+                parts.append("NOT NULL")
+            if col["default"] is not None:
+                parts.append(f"DEFAULT {col['default']}")
+
+            col_lines.append(" ".join(parts))
+
+        # primary key constraint.
+        pk_cols = table_info["primary_key"]["constrained_columns"]
+        pk_name = table_info["primary_key"].get("name") or f"{table_name}_pkey"
+
+        if pk_cols:
+            constraint_lines.append(
+                f"\tCONSTRAINT {pk_name} PRIMARY KEY ({', '.join(pk_cols)})"
+            )
+
+        # foreign key constraints.
+        for fk in table_info["foreign_keys"]:
+            fk_def = (
+                f"\tFOREIGN KEY ({fk['constrained_column']}) "
+                f"REFERENCES {fk['referred_table']} ({fk['referred_column']})"
+            )
+            constraint_lines.append(fk_def)
+
+        # assemble CREATE TABLE block.
+        all_lines = col_lines + constraint_lines
+        create_block = (
+            f"CREATE TABLE {table_name} (\n"
+            + ",\n".join(all_lines)
+            + "\n)"
+        )
+
+        # indexes block (non-unique ones are still useful context)
+        index_lines = []
+        for idx in table_info["indexes"]:
+            unique_kw = "UNIQUE " if idx["unique"] else ""
+            index_lines.append(
+                f"CREATE {unique_kw}INDEX {idx['name']} ON {table_name} ({', '.join(idx['columns'])})"
+            )
+
+        # sample rows block as a tab-separated table
+        sample_block = ""
+        if table_info["sample_rows"]:
+            col_names  = list(table_info["columns"].keys())
+            header     = "\t".join(col_names)
+            data_rows  = [
+                "\t".join(str(row.get(c, "")) for c in col_names)
+                for row in table_info["sample_rows"]
+            ]
+            row_count  = table_info["row_count"]
+            sample_block = (
+                f"\n/*\n{row_count:,} rows from {table_name} table:\n"
+                + header + "\n"
+                + "\n".join(data_rows)
+                + "\n*/"
+            )
+
+        # combine everything for this table.
+        table_block = create_block
+        if index_lines:
+            table_block += "\n" + "\n".join(index_lines)
+        table_block += sample_block
+
+        blocks.append(table_block)
+
+    return "\n\n\n".join(blocks)
+
+
+
 connection_string = "postgresql://neondb_owner:npg_0BIGLmyafP8F@ep-green-cake-aixp8d41-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 
-schema = inspect_database(connection_string)
+def get_schema_and_prompt(connection_string: str, sample_rows: int = 2) -> tuple[dict, str]:
 
-print(schema)
+    schema = inspect_database(connection_string, sample_rows=sample_rows)
+    prompt = build_llm_prompt(schema)
+    return schema, prompt
+
+# schema, prompt = get_schema_and_prompt("https://storage.googleapis.com/benchmarks-artifacts/chinook/Chinook.db")
+
+# print(prompt)

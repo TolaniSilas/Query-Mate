@@ -48,3 +48,36 @@ This system operates or functions as an AI-assisted database agent that:
 - No data modification capabilities 
 - Secure database credential handling: Ensure that database credentials are collected securely.
 
+
+
+
+
+
+
+## High-Level System Design
+
+User Question
+      ↓
+  SQL Agent          → generates SQL from NL question + schema
+      ↓
+  Validator Agent    → checks: "does this SQL actually answer the question?"
+      ↓ (if fail)    → sends feedback back to SQL Agent to regenerate (retry loop)
+      ↓ (if pass)
+  query_validator.py → security check (is it SELECT-only?)
+      ↓
+  Execute Query      → run on DB
+      ↓
+  Response Agent     → results → natural language answer
+
+
+
+  question
+  → SQL Agent          generates SQL
+      → Validator Agent    "does this SQL answer the question?"
+          ✗ FAIL           returns feedback → SQL Agent retries (up to 3x)
+          ✓ PASS
+      → query_validator.py security check (is it SELECT-only?)
+          ✗ FAIL           hard reject, no retry
+          ✓ PASS
+      → execute on DB
+  → Response Agent     results → natural language answer
