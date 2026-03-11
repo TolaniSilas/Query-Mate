@@ -253,6 +253,8 @@ if __name__ == "__main__":
     import os
     from dotenv import load_dotenv
     import sys
+    from core.query_validator import is_safe_query
+
 
 
     load_dotenv()
@@ -291,13 +293,40 @@ if __name__ == "__main__":
         LIMIT 1
     """
 
-    exe_query = execute_query(sql=sql, session_id=SESSION_ID)
-    print()
-    print(f"columns : {exe_query['columns']}")
-    print(f"rows    : {exe_query['rows']}")
-    print(f"error   : {exe_query['error']}")
-    print()
-    print()
+
+    def safe_executor(sql: str) -> dict:
+        """
+        security gate for rejecting anything that isn't a SELECT before hitting the DB.
+        this idea is intentionally separate or different from the Validator Agent (which is quality for query validation, not security).
+        this safe executor is for security check.
+        """
+
+        safe, reason = is_safe_query(sql)
+        if not safe:
+            logger.warning("pipeline | security_rejected | reason: %s", reason)
+            return {
+                "rows":  None,
+                "error": f"SECURITY_REJECTED: {reason}"
+            }
+
+        # query is safe - execute on the actual database.
+        return execute_query(sql, SESSION_ID)
+    
+    
+    exe_query = safe_executor(sql)
+
+    if exe_query["error"]:
+        print(f"error   : {exe_query['error']}")
+        print(f"rows    : {exe_query['rows']}")
+        
+    else:
+        print()
+        print(f"columns : {exe_query['columns']}")
+        print(f"rows    : {exe_query['rows']}")
+        print(f"error   : {exe_query['error']}")
+        print()
+        print()
+
 
     # disconnect from the databse.
     print("disconnecting...")
