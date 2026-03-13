@@ -19,6 +19,7 @@ load_dotenv()
 SUPPORTED_DB_TYPES = {"sqlite", "postgresql", "mysql"}
 
 
+
 def get_db_credentials(db_type: str) -> dict:
     """
     loads and returns database credentials from environment variables.
@@ -36,7 +37,7 @@ def get_db_credentials(db_type: str) -> dict:
     ValueError   if db_type is not supported
     KeyError     if a required env var is missing
     """
-    
+
     db_type = db_type.lower().strip()
 
     if db_type not in SUPPORTED_DB_TYPES:
@@ -48,26 +49,9 @@ def get_db_credentials(db_type: str) -> dict:
     if db_type == "sqlite":
         return _load_sqlite_credentials()
 
-    # for postgresql and mysql, use DATABASE_URL directly
-    # SQLAlchemy handles everything — sslmode, channel_binding, and all query params
+    # for postgresql and mysql, use DATABASE_URL directly. SQLAlchemy handles everything — sslmode, channel_binding, and all query params.
     return {"url": _require_env("DATABASE_URL")}
 
-
-def get_anthropic_api_key() -> str:
-    """
-    returns the Anthropic API key from the environment.
-
-    raises
-    ------
-    KeyError if ANTHROPIC_API_KEY is not set
-    """
-    key = os.environ.get("ANTHROPIC_API_KEY")
-    if not key:
-        raise KeyError(
-            "ANTHROPIC_API_KEY is not set. "
-            "Add it to your .env file or environment."
-        )
-    return key
 
 
 def validate_env(db_type: str) -> dict:
@@ -84,6 +68,7 @@ def validate_env(db_type: str) -> dict:
         "db_type": str
     }
     """
+
     db_type  = db_type.lower().strip()
     required = _required_vars(db_type)
     missing  = [var for var in required if not os.environ.get(var)]
@@ -95,8 +80,8 @@ def validate_env(db_type: str) -> dict:
     }
 
 
-# credential loaders.
 
+# credential loaders.
 def _load_sqlite_credentials() -> dict:
     path     = _require_env("DB_SQLITE_PATH")
     resolved = Path(path).resolve()
@@ -110,9 +95,13 @@ def _load_sqlite_credentials() -> dict:
     return {"database": str(resolved)}
 
 
+
 # helpers.
 def _require_env(var: str) -> str:
-    # gets an env var or raises a clear error if it's missing
+    """
+    gets an env var or raises a clear error if it's missing.
+    """
+
     value = os.environ.get(var)
     if not value:
         raise KeyError(
@@ -123,7 +112,10 @@ def _require_env(var: str) -> str:
 
 
 def _required_vars(db_type: str) -> list[str]:
-    # returns the list of required env var names for each db type
+    """
+    returns the list of required env var names for each db type.
+    """
+    
     if db_type == "sqlite":
         return ["DB_SQLITE_PATH"]
     if db_type in ("postgresql", "mysql"):
