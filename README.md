@@ -58,26 +58,37 @@ This system operates or functions as an AI-assisted database agent that:
 
 User Question
       ↓
-  SQL Agent          → generates SQL from NL question + schema
+  SQL Agent --> generates SQL from NL question + schema
       ↓
-  Validator Agent    → checks: "does this SQL actually answer the question?"
-      ↓ (if fail)    → sends feedback back to SQL Agent to regenerate (retry loop)
+  Validator Agent --> checks: "does this SQL actually answer the question?"
+      ↓ (if fail) --> sends feedback back to SQL Agent to regenerate (retry loop)
       ↓ (if pass)
-  query_validator.py → security check (is it SELECT-only?)
+  query_validator.py -->security check (is it SELECT-only?)
       ↓
-  Execute Query      → run on DB
+  Execute Query --> run on DB
       ↓
-  Response Agent     → results → natural language answer
+  Response Agent --> results → natural language answer
 
 
 
   question
-  → SQL Agent          generates SQL
-      → Validator Agent    "does this SQL answer the question?"
+  --> SQL Agent          generates SQL
+      --> Validator Agent    "does this SQL answer the question?"
           ✗ FAIL           returns feedback → SQL Agent retries (up to 3x)
           ✓ PASS
-      → query_validator.py security check (is it SELECT-only?)
+      --> query_validator.py security check (is it SELECT-only?)
           ✗ FAIL           hard reject, no retry
           ✓ PASS
-      → execute on DB
-  → Response Agent     results → natural language answer
+      --> execute on DB
+  --> Response Agent     results → natural language answer
+
+
+
+# all tests
+uv run pytest tests/ -v
+
+# just the package tests
+uv run pytest tests/querymate/ -v
+
+# just the API tests
+uv run pytest tests/api/ -v

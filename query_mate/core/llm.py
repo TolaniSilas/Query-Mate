@@ -13,8 +13,12 @@ supported providers:
 """
 
 import os
-import anthropic
 from core.logger import get_logger
+import anthropic
+from openai import OpenAI
+from groq import Groq
+from google import genai
+from google.genai import types
 
 
 
@@ -91,7 +95,7 @@ def _anthropic(system: str, user: str, max_tokens: int, model: str) -> str:
 
 
 def _openai(system: str, user: str, max_tokens: int, model: str) -> str:
-    from openai import OpenAI
+    
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
     response = client.responses.create(
@@ -103,7 +107,7 @@ def _openai(system: str, user: str, max_tokens: int, model: str) -> str:
 
 
 def _groq(system: str, user: str, max_tokens: int, model: str) -> str:
-    from groq import Groq
+    
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
     response = client.chat.completions.create(
@@ -118,8 +122,6 @@ def _groq(system: str, user: str, max_tokens: int, model: str) -> str:
 
 
 def _gemini(system: str, user: str, max_tokens: int, model: str) -> str:
-    from google import genai
-    from google.genai import types
 
     client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 

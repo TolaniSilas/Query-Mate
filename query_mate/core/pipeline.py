@@ -4,7 +4,7 @@ this is the main orchestrator. it wires all agents together into a single call.
 full flow:
     question
     --> [SQL Agent]         NL --> SQL (with retry loop)
-        --> [Validator Agent]   quality + intent check (runs inside SQL Agent loop)
+        --> [Validator Agent]   quality + intent check (runs inside sql agent loop)
     --> [query_validator]   security check (SELECT-only enforcement)
     --> [executor]          run SQL on DB
     --> [Response Agent]    results --> natural language answer
