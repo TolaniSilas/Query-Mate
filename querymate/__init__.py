@@ -1,29 +1,30 @@
 """
-querymate — natural language interface for relational databases.
+querymate is a natural language Python package for querying relational databases. It currently supports 
+MySQL, PostgreSQL, and SQLite, and enforces security at both the 'connection' level and 'type of query' 
+level - ensuring only safe, read-only operations reach your database.
 
 usage:
     from querymate import QueryMate
 
     qm = QueryMate(
         database_url = "postgresql://user:password@host/dbname?sslmode=require",
-        db_type      = "postgresql",
+        db_type = "postgresql",
     )
 
     result = qm.ask("which merchant had the highest revenue last month?")
 
-    print(result.answer)    # natural language answer
+    print(result.answer)    # this is the natural language answer
     print(result.sql)       # the SQL that was generated and executed
     print(result.rows)      # raw result rows
     print(result.status)    # "ok" | "cannot_answer" | "validation_failed" | "error"
 
-    qm.disconnect()
+    qm.disconnect()  # this terminates the database connection.
 """
 
 import uuid
-
 from querymate.core.connection import connect, disconnect, get_session
-from querymate.core.pipeline   import run_pipeline
-from querymate.core.logger     import get_logger
+from querymate.core.pipeline import run_pipeline
+from querymate.core.logger import get_logger
 
 
 logger = get_logger(__name__)
@@ -36,20 +37,20 @@ class QueryResult:
     """
 
     def __init__(self, data: dict):
-        self.answer    = data.get("answer")
-        self.sql       = data.get("sql")
-        self.rows      = data.get("rows")
+        self.answer = data.get("answer")
+        self.sql = data.get("sql")
+        self.rows = data.get("rows")
         self.row_count = data.get("row_count", 0)
         self.truncated = data.get("truncated", False)
-        self.attempts  = data.get("attempts", 1)
-        self.status    = data.get("status")
-        self.error     = data.get("error")
+        self.attempts = data.get("attempts", 1)
+        self.status = data.get("status")
+        self.error = data.get("error")
 
     def __repr__(self):
         return (
             f"QueryResult("
-            f"status={self.status!r}, "
-            f"row_count={self.row_count}, "
+            f"status={self.status!r},"
+            f"row_count={self.row_count},"
             f"attempts={self.attempts}"
             f")"
         )
@@ -69,35 +70,35 @@ class QueryMate:
     db_type      : "postgresql" | "mysql" | "sqlite"
     sqlite_path  : absolute path to the sqlite file (sqlite only)
 
-    example
+    
+    for usage, here is an instance: 
     -------
     # postgresql / mysql
     qm = QueryMate(
         database_url = "postgresql://user:pass@host/dbname?sslmode=require",
-        db_type      = "postgresql",
+        db_type = "postgresql",
     )
 
     # sqlite
     qm = QueryMate(
-        db_type     = "sqlite",
+        db_type = "sqlite",
         sqlite_path = "/path/to/database.sqlite",
     )
     """
 
-    def __init__(self, db_type: str, database_url: str | None = None,
-                 sqlite_path: str | None = None):
+    def __init__(self, db_type: str, database_url: str | None = None, sqlite_path: str | None = None):
 
         self._session_id = str(uuid.uuid4())
-        self._db_type    = db_type.lower().strip()
-        self._connected  = False
+        self._db_type = db_type.lower().strip()
+        self._connected = False
 
         credentials = self._build_credentials(database_url, sqlite_path)
 
         logger.info("querymate | initialising | db_type: %s", self._db_type)
 
         result = connect(
-            session_id  = self._session_id,
-            db_type     = self._db_type,
+            session_id = self._session_id,
+            db_type = self._db_type,
             credentials = credentials,
         )
 
@@ -106,10 +107,10 @@ class QueryMate:
                 f"Failed to connect to database: {result['error']}"
             )
 
-        self._connected  = True
-        self.db_type     = result["db_type"]
+        self._connected = True
+        self.db_type = result["db_type"]
         self.table_count = result["table_count"]
-        self.tables      = result["tables"]
+        self.tables = result["tables"]
 
         logger.info("querymate | connected | tables: %d", self.table_count)
 
@@ -131,6 +132,7 @@ class QueryMate:
         RuntimeError   if called after disconnect()
         ValueError     if question is empty
         """
+        
         if not self._connected:
             raise RuntimeError(
                 "QueryMate is not connected. "
@@ -138,21 +140,22 @@ class QueryMate:
             )
 
         question = question.strip()
+
         if not question:
             raise ValueError("question cannot be empty.")
 
         session = get_session(self._session_id)
-        
+
         if not session:
             raise RuntimeError("Session expired. Create a new QueryMate instance to reconnect.")
 
         logger.info("querymate | ask | question: %s", question)
 
         result = run_pipeline(
-            question      = question,
+            question = question,
             schema_prompt = session["schema_prompt"],
-            db_type       = self._db_type,
-            session_id    = self._session_id,
+            db_type = self._db_type,
+            session_id = self._session_id,
         )
 
         return QueryResult(result)
@@ -178,14 +181,16 @@ class QueryMate:
         this supports usage as a context manager:
 
         with QueryMate(...) as qm:
-            result = qm.ask("...")
+            result = qm.ask("your question")
 
         """
 
-        self.disconnect()
+        # terminate the database connection.
+        self.disconnect() 
 
 
     def _build_credentials(self, database_url: str | None, sqlite_path: str | None) -> dict:
+        
         if self._db_type == "sqlite":
             if not sqlite_path:
                 raise ValueError("sqlite_path is required for db_type='sqlite'.")
