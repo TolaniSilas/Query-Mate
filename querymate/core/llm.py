@@ -74,10 +74,10 @@ def _anthropic(system: str, user: str, max_tokens: int, model: str) -> str:
 
     try:
         response = client.messages.create(
-            model      = model,
+            model = model,
             max_tokens = max_tokens,
-            system     = system,
-            messages   = [{"role": "user", "content": user}],
+            system = system,
+            messages = [{"role": "user", "content": user}],
         )
         return response.content[0].text.strip()
 
@@ -99,8 +99,8 @@ def _openai(system: str, user: str, max_tokens: int, model: str) -> str:
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
     response = client.responses.create(
-        model  = model,
-        input  = user,
+        model = model,
+        input = user,
         instructions = system,
     )
     return response.output_text.strip()
@@ -111,9 +111,9 @@ def _groq(system: str, user: str, max_tokens: int, model: str) -> str:
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
     response = client.chat.completions.create(
-        model      = model,
+        model = model,
         max_tokens = max_tokens,
-        messages   = [
+        messages = [
             {"role": "system", "content": system},
             {"role": "user",   "content": user},
         ],
@@ -126,11 +126,11 @@ def _gemini(system: str, user: str, max_tokens: int, model: str) -> str:
     client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
     response = client.models.generate_content(
-        model    = model,
+        model = model,
         contents = user,
-        config   = types.GenerateContentConfig(
+        config = types.GenerateContentConfig(
             system_instruction = system,
-            max_output_tokens  = max_tokens,
+            max_output_tokens = max_tokens,
         ),
     )
     return response.text.strip()

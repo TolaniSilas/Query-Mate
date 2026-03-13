@@ -12,7 +12,6 @@ it checks:
 if it rejects, it returns specific feedback so the SQL Agent can self-correct.
 """
 
-import os
 from core.llm import chat
 from core.logger import get_logger
 
@@ -109,29 +108,29 @@ Is this SQL correct and complete for the question?"""
 
     try:
         raw = chat(
-            system     = system_prompt,
-            user       = user_content,
+            system = system_prompt,
+            user = user_content,
             max_tokens = 512,
-            provider   = "anthropic",
-            model      = "claude-sonnet-4-20250514",
+            provider = "anthropic",
+            model = "claude-sonnet-4-20250514",
         )
 
-        verdict  = _extract_field(raw, "VERDICT")
-        reason   = _extract_field(raw, "REASON")
+        verdict = _extract_field(raw, "VERDICT")
+        reason = _extract_field(raw, "REASON")
         feedback = _extract_field(raw, "FEEDBACK")
 
         if verdict and "PASS" in verdict.upper():
             logger.info("validator | PASS | reason: %s", reason)
             return {
-                "status":   "ok",
-                "reason":   reason or "SQL is valid and answers the question.",
+                "status": "ok",
+                "reason": reason or "SQL is valid and answers the question.",
                 "feedback": None,
             }
         else:
             logger.warning("validator | FAIL | reason: %s | feedback: %s", reason, feedback)
             return {
-                "status":   "rejected",
-                "reason":   reason or "SQL does not correctly answer the question.",
+                "status": "rejected",
+                "reason": reason or "SQL does not correctly answer the question.",
                 "feedback": feedback or "Revisit the query logic and schema relationships.",
             }
 
@@ -139,14 +138,17 @@ Is this SQL correct and complete for the question?"""
         # validator is unavailable — log the error so it can be investigated in production
         logger.error("validator | API error — validator unavailable: %s", str(e), exc_info=True)
         return {
-            "status":   "error",
-            "reason":   f"Validator encountered an error: {str(e)}",
+            "status": "error",
+            "reason": f"Validator encountered an error: {str(e)}",
             "feedback": None,
         }
 
 
 def _extract_field(text: str, field: str) -> str | None:
-    # extracts "FIELD: value" from the LLM response
+    """
+    extracts "FIELD: value" from the LLM response.
+    """
+
     for line in text.splitlines():
         if line.strip().upper().startswith(f"{field}:"):
             return line.split(":", 1)[1].strip()

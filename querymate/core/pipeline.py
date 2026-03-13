@@ -61,7 +61,7 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
         if not safe:
             logger.warning("pipeline | security_rejected | reason: %s", reason)
             return {
-                "rows":  None,
+                "rows": None,
                 "error": f"SECURITY_REJECTED: {reason}"
             }
 
@@ -70,11 +70,11 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
 
     # run the SQL Agent (includes Validator Agent retry loop).
     sql_result = run_sql_agent(
-        question     = question,
+        question = question,
         schema_prompt = schema_prompt,
-        db_type      = db_type,
+        db_type = db_type,
         validator_fn = lambda q, s, sp: validator_agent(q, s, sp),
-        executor_fn  = safe_executor,
+        executor_fn = safe_executor,
     )
 
     # surface security rejections clearly in the status.
@@ -86,22 +86,22 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
     # pass everything to the Response Agent.
     response = generate_response(
         question = question,
-        sql      = sql_result.get("sql") or "",
-        rows     = sql_result.get("rows"),
-        status   = sql_result["status"],
-        error    = sql_result.get("error"),
+        sql = sql_result.get("sql") or "",
+        rows = sql_result.get("rows"),
+        status = sql_result["status"],
+        error = sql_result.get("error"),
         attempts = sql_result.get("attempts", 1),
     )
 
     logger.info("pipeline | completed | status: %s", response["status"])
 
     return {
-        "answer":    response["answer"],
-        "sql":       sql_result.get("sql"),
-        "rows":      sql_result.get("rows"),
+        "answer": response["answer"],
+        "sql": sql_result.get("sql"),
+        "rows": sql_result.get("rows"),
         "row_count": response["row_count"],
         "truncated": response["truncated"],
-        "attempts":  sql_result.get("attempts", 1),
-        "status":    response["status"],
-        "error":     sql_result.get("error"),
+        "attempts": sql_result.get("attempts", 1),
+        "status": response["status"],
+        "error": sql_result.get("error"),
     }

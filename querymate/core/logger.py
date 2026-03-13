@@ -12,14 +12,14 @@ usage:
 """
 
 
-import logging
 import os
+import logging
 from logging.handlers import RotatingFileHandler
 
 
 # log level is controlled via the LOG_LEVEL env var (default: INFO)
-LOG_LEVEL   = os.environ.get("LOG_LEVEL", "INFO").upper()
-LOG_FORMAT  = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
+LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
@@ -44,10 +44,10 @@ def _build_root_logger() -> logging.Logger:
     os.makedirs(log_dir, exist_ok=True)
 
     file_handler = RotatingFileHandler(
-        filename    = os.path.join(log_dir, "app.log"),
-        maxBytes    = 5 * 1024 * 1024,  # 5MB
+        filename = os.path.join(log_dir, "app.log"),
+        maxBytes = 5 * 1024 * 1024,  # 5MB
         backupCount = 3,
-        encoding    = "utf-8",
+        encoding = "utf-8",
     )
     file_handler.setFormatter(formatter)
     root.addHandler(file_handler)

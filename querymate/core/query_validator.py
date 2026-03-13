@@ -50,11 +50,11 @@ def is_safe_query(sql: str) -> tuple[bool, str | None]:
 
     parameters
     ----------
-    sql : the SQL string to validate
+    sql: the SQL string to validate
 
     returns
     -------
-    (True, None)         - query is safe, proceed to execution
+    (True, None) - query is safe, proceed to execution
     (False, reason: str) - query is unsafe, reason explains why
     """
 

@@ -9,10 +9,10 @@ responsibilities:
   - clean up connections on disconnect
 
 read-only enforcement strategy (layered):
-  SQLite     -> connect with uri=True + mode=ro flag
+  SQLite -> connect with uri=True + mode=ro flag
   PostgreSQL -> SET TRANSACTION READ ONLY on every connection checkout
-  MySQL      -> SET SESSION TRANSACTION READ ONLY on connect
-  All        -> query_validator.py rejects non-SELECT before execution (belt + braces)
+  MySQL -> SET SESSION TRANSACTION READ ONLY on connect
+  All -> query_validator.py rejects non-SELECT before execution (belt + braces)
 """
 
 
@@ -106,11 +106,11 @@ def connect(session_id: str, db_type: str, credentials: dict) -> dict:
         logger.info("connection | connecting | db_type: %s | session: %s", db_type, session_id)
 
         if db_type == "sqlite":
-            engine            = _build_sqlite_engine(credentials["database"])
+            engine = _build_sqlite_engine(credentials["database"])
             connection_string = f"sqlite:///{credentials['database']}"
 
         elif db_type in ("postgresql", "mysql"):
-            engine            = _build_url_engine(credentials["url"], db_type)
+            engine = _build_url_engine(credentials["url"], db_type)
             connection_string = credentials["url"]
 
         else:
@@ -123,23 +123,23 @@ def connect(session_id: str, db_type: str, credentials: dict) -> dict:
 
         # inspect schema once and cache everything for the session
         schema, schema_prompt = get_schema_and_prompt(connection_string)
-        tables                = list(schema["tables"].keys())
+        tables = list(schema["tables"].keys())
 
         _sessions[session_id] = {
-            "engine":        engine,
-            "db_type":       db_type,
-            "schema":        schema,
+            "engine": engine,
+            "db_type": db_type,
+            "schema": schema,
             "schema_prompt": schema_prompt,
         }
 
         logger.info("connection | connected | tables: %d | session: %s", len(tables), session_id)
 
         return {
-            "status":      "ok",
-            "db_type":     db_type,
+            "status": "ok",
+            "db_type": db_type,
             "table_count": len(tables),
-            "tables":      tables,
-            "error":       None,
+            "tables": tables,
+            "error": None,
         }
 
     except Exception as e:
@@ -163,7 +163,7 @@ def disconnect(session_id: str) -> dict:
         del _sessions[session_id]
         logger.info("connection | disconnected | session: %s", session_id)
 
-        return {"status": "ok"}
+        return {"status": "ok", "error": None}
 
     except Exception as e:
         logger.error("connection | disconnect error | session: %s | error: %s", session_id, str(e), exc_info=True)
@@ -208,9 +208,9 @@ def execute_query(sql: str, session_id: str) -> dict:
         logger.debug("connection | executing query | session: %s\n%s", session_id, sql)
 
         with session["engine"].connect() as conn:
-            result  = conn.execute(text(sql))
+            result = conn.execute(text(sql))
             columns = list(result.keys())
-            rows    = [
+            rows = [
                 {col: _serialize(val) for col, val in zip(columns, row)}
                 for row in result.fetchall()
             ]
@@ -250,12 +250,11 @@ def _serialize(value: Any) -> Any:
 
 
 if __name__ == "__main__":
+
     import os
     from dotenv import load_dotenv
     import sys
     from core.query_validator import is_safe_query
-
-
 
     load_dotenv()
 
@@ -264,16 +263,16 @@ if __name__ == "__main__":
     # connect to a database.
     print("connecting...")
     conn_result = connect(
-        session_id  = SESSION_ID,
-        db_type     = "postgresql",
+        session_id = SESSION_ID,
+        db_type = "postgresql",
         credentials = {"url": os.environ["DATABASE_URL"]},
     )
 
     print()
-    print(f"status      : {conn_result['status']}")
-    print(f"table_count : {conn_result['table_count']}")
-    print(f"tables      : {conn_result['tables']}")
-    print(f"error       : {conn_result['error']}")
+    print(f"status: {conn_result['status']}")
+    print(f"table_count: {conn_result['table_count']}")
+    print(f"tables: {conn_result['tables']}")
+    print(f"error: {conn_result['error']}")
     print()
     print()
 
@@ -305,7 +304,7 @@ if __name__ == "__main__":
         if not safe:
             logger.warning("pipeline | security_rejected | reason: %s", reason)
             return {
-                "rows":  None,
+                "rows": None,
                 "error": f"SECURITY_REJECTED: {reason}"
             }
 
@@ -316,14 +315,14 @@ if __name__ == "__main__":
     exe_query = safe_executor(sql)
 
     if exe_query["error"]:
-        print(f"error   : {exe_query['error']}")
-        print(f"rows    : {exe_query['rows']}")
+        print(f"error: {exe_query['error']}")
+        print(f"rows: {exe_query['rows']}")
         
     else:
         print()
-        print(f"columns : {exe_query['columns']}")
-        print(f"rows    : {exe_query['rows']}")
-        print(f"error   : {exe_query['error']}")
+        print(f"columns: {exe_query['columns']}")
+        print(f"rows: {exe_query['rows']}")
+        print(f"error: {exe_query['error']}")
         print()
         print()
 
@@ -332,4 +331,4 @@ if __name__ == "__main__":
     print("disconnecting...")
     disc_result = disconnect(SESSION_ID)
     print()
-    print(f"status : {disc_result['status']}")
+    print(f"status: {disc_result['status']}")

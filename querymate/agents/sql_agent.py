@@ -3,14 +3,13 @@ this converts a natural language question into a sql query using the LLM.
 and accepts feedback from the validator agent and retries if needed.
 """
 
-import os
+
 import re
 from core.llm import chat
 from core.logger import get_logger
 
 
-
-logger      = get_logger(__name__)
+logger = get_logger(__name__)
 max_retries = 3
 
 
@@ -49,8 +48,12 @@ describes. Do not rewrite the entire query — only correct the specific issue i
 
 
 def _extract_sql(raw: str) -> str:
-    # strip markdown fences if the LLM wrapped it anyway
+    """
+    strip markdown fences if the LLM wrapped it anyway.
+    """
+
     cleaned = re.sub(r"```sql|```", "", raw, flags=re.IGNORECASE).strip()
+
     return cleaned
 
 
@@ -73,6 +76,7 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
         "error":  str | None
     }
     """
+
     system_prompt = _build_system_prompt(schema_prompt, db_type)
 
     # on a retry, append the validator's feedback so the LLM can self-correct
@@ -87,11 +91,11 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
 
     try:
         raw_text = chat(
-            system     = system_prompt,
-            user       = user_content,
+            system = system_prompt,
+            user = user_content,
             max_tokens = 1024,
-            provider   = "anthropic",
-            model      = "claude-sonnet-4-20250514",
+            provider = "anthropic",
+            model = "claude-sonnet-4-20250514",
         )
 
         if "CANNOT_ANSWER" in raw_text.upper():
@@ -134,12 +138,12 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
     }
     """
 
-    feedback   = None
+    feedback = None
     last_error = None
 
     logger.info("sql_agent | starting pipeline | question: %s", question)
 
-    for attempt in range(1, max_retries + 1):
+    for attempt in range(1, max_retries+1):
 
         logger.info("sql_agent | attempt %d of %d", attempt, max_retries)
 
@@ -148,26 +152,26 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
         if gen_result["status"] == "cannot_answer":
             logger.info("sql_agent | question unanswerable from schema")
             return {
-                "sql":      None,
-                "rows":     None,
-                "status":   "cannot_answer",
+                "sql": None,
+                "rows": None,
+                "status": "cannot_answer",
                 "attempts": attempt,
-                "error":    "Question cannot be answered from the available schema.",
+                "error": "Question cannot be answered from the available schema.",
             }
 
         if gen_result["status"] == "error":
             logger.error("sql_agent | generation error: %s", gen_result["error"])
             return {
-                "sql":      None,
-                "rows":     None,
-                "status":   "error",
+                "sql": None,
+                "rows": None,
+                "status": "error",
                 "attempts": attempt,
-                "error":    gen_result["error"],
+                "error": gen_result["error"],
             }
 
         sql = gen_result["sql"]
 
-        # validate — quality + intent check (LLM-based)
+        # validate: quality + intent check (LLM-based)
         val_result = validator_fn(question, sql, schema_prompt)
 
         if val_result["status"] == "ok":
@@ -175,32 +179,34 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
 
             if exec_result.get("error"):
                 # execution failed; treat the DB error as feedback and retry.
-                feedback   = f"The SQL caused a database error: {exec_result['error']}"
+                feedback = f"The SQL caused a database error: {exec_result['error']}"
                 last_error = exec_result["error"]
                 logger.warning("sql_agent | execution error on attempt %d: %s", attempt, last_error)
                 continue
 
             logger.info("sql_agent | success on attempt %d | rows returned: %d",
-                        attempt, len(exec_result.get("rows") or []))
+                        attempt, len(exec_result.get("rows") or [])
+                        )
+            
             return {
-                "sql":      sql,
-                "rows":     exec_result["rows"],
-                "status":   "ok",
+                "sql": sql,
+                "rows": exec_result["rows"],
+                "status": "ok",
                 "attempts": attempt,
-                "error":    None,
+                "error": None,
             }
 
         # validation rejected; collect feedback for next attempt.
-        feedback   = val_result["feedback"]
+        feedback = val_result["feedback"]
         last_error = feedback
         logger.warning("sql_agent | validation rejected on attempt %d | feedback: %s", attempt, feedback)
 
     # exhausted all retries
     logger.error("sql_agent | all %d attempts exhausted | last error: %s", max_retries, last_error)
     return {
-        "sql":      sql,
-        "rows":     None,
-        "status":   "validation_failed",
+        "sql": sql,
+        "rows": None,
+        "status": "validation_failed",
         "attempts": max_retries,
-        "error":    f"Could not generate a valid query after {max_retries} attempts. Last issue: {last_error}",
+        "error": f"Could not generate a valid query after {max_retries} attempts. Last issue: {last_error}",
     }

@@ -34,8 +34,8 @@ def get_db_credentials(db_type: str) -> dict:
 
     raises
     ------
-    ValueError   if db_type is not supported
-    KeyError     if a required env var is missing
+    ValueError: if db_type is not supported
+    KeyError: if a required env var is missing
     """
 
     db_type = db_type.lower().strip()
@@ -63,18 +63,18 @@ def validate_env(db_type: str) -> dict:
     returns
     -------
     {
-        "valid":   bool,
+        "valid": bool,
         "missing": [str, ...],
         "db_type": str
     }
     """
 
-    db_type  = db_type.lower().strip()
+    db_type = db_type.lower().strip()
     required = _required_vars(db_type)
-    missing  = [var for var in required if not os.environ.get(var)]
+    missing = [var for var in required if not os.environ.get(var)]
 
     return {
-        "valid":   len(missing) == 0,
+        "valid": len(missing) == 0,
         "missing": missing,
         "db_type": db_type,
     }
@@ -83,7 +83,7 @@ def validate_env(db_type: str) -> dict:
 
 # credential loaders.
 def _load_sqlite_credentials() -> dict:
-    path     = _require_env("DB_SQLITE_PATH")
+    path = _require_env("DB_SQLITE_PATH")
     resolved = Path(path).resolve()
 
     if not resolved.exists():

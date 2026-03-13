@@ -17,9 +17,9 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
     
     # the same four inspector calls work for SQLite, PostgreSQL, and MySQL.
     # SQLAlchemy handles all dialect differences internally.
-    engine    = create_engine(connection_string)
+    engine = create_engine(connection_string)
     inspector = inspect(engine)
-    db_type   = engine.dialect.name  # "sqlite" or "postgresql" or "mysql"
+    db_type = engine.dialect.name  # "sqlite" or "postgresql" or "mysql"
 
     schema: dict[str, Any] = {"database_type": db_type, "tables": {}}
 
@@ -33,9 +33,9 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
 
         for col in raw_columns:
             columns[col["name"]] = {
-                "type":        str(col["type"]),
-                "nullable":    col.get("nullable", True),
-                "default":     col.get("default"),
+                "type": str(col["type"]),
+                "nullable": col.get("nullable", True),
+                "default": col.get("default"),
                 "primary_key": bool(col.get("primary_key", False)),
                 "foreign_key": None,  # filled in below
             }
@@ -48,7 +48,7 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
                 columns[pk_col]["primary_key"] = True
 
         # get_foreign_keys: the keys with relationships to other tables.
-        raw_fks      = inspector.get_foreign_keys(table)
+        raw_fks = inspector.get_foreign_keys(table)
         foreign_keys = []
 
         for fk in raw_fks:
@@ -56,10 +56,10 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
 
                 foreign_keys.append({
                     "constrained_column": local_col,
-                    "referred_table":     fk["referred_table"],
-                    "referred_column":    ref_col,
-                    "on_update":          fk.get("options", {}).get("onupdate", "NO ACTION"),
-                    "on_delete":          fk.get("options", {}).get("ondelete", "NO ACTION"),
+                    "referred_table": fk["referred_table"],
+                    "referred_column": ref_col,
+                    "on_update": fk.get("options", {}).get("onupdate", "NO ACTION"),
+                    "on_delete": fk.get("options", {}).get("ondelete", "NO ACTION"),
                 })
 
                 # also annotate the column directly for quick lookup.
@@ -70,8 +70,8 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
         raw_indexes = inspector.get_indexes(table)
         indexes = [
             {
-                "name":    idx["name"],
-                "unique":  bool(idx.get("unique", False)),
+                "name": idx["name"],
+                "unique": bool(idx.get("unique", False)),
                 "columns": idx.get("column_names", []),
             }
             for idx in raw_indexes
@@ -83,21 +83,21 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
 
         # extract top 3 sample rows.
         with engine.connect() as conn:
-            result    = conn.execute(text(f"SELECT * FROM {table} LIMIT {sample_rows}"))
+            result = conn.execute(text(f"SELECT * FROM {table} LIMIT {sample_rows}"))
             col_names = list(result.keys())
-            rows      = [dict(zip(col_names, row)) for row in result.fetchall()]
+            rows = [dict(zip(col_names, row)) for row in result.fetchall()]
 
 
         schema["tables"][table] = {
-            "row_count":    row_count,
-            "columns":      columns,
-            "primary_key":  {
+            "row_count": row_count,
+            "columns": columns,
+            "primary_key": {
                 "constrained_columns": pk_constraint.get("constrained_columns", []),
-                "name":                pk_constraint.get("name"),
+                "name": pk_constraint.get("name"),
             },
             "foreign_keys": foreign_keys,
-            "indexes":      indexes,
-            "sample_rows":  rows,
+            "indexes": indexes,
+            "sample_rows": rows,
         }
 
 
@@ -114,7 +114,7 @@ def build_llm_prompt(schema: dict) -> str:
     blocks = []
 
     for table_name, table_info in schema["tables"].items():
-        col_lines    = []
+        col_lines = []
         constraint_lines = []
 
         for col_name, col in table_info["columns"].items():
@@ -164,13 +164,13 @@ def build_llm_prompt(schema: dict) -> str:
         # sample rows block as a tab-separated table
         sample_block = ""
         if table_info["sample_rows"]:
-            col_names  = list(table_info["columns"].keys())
-            header     = "\t".join(col_names)
-            data_rows  = [
+            col_names = list(table_info["columns"].keys())
+            header = "\t".join(col_names)
+            data_rows = [
                 "\t".join(str(row.get(c, "")) for c in col_names)
                 for row in table_info["sample_rows"]
             ]
-            row_count  = table_info["row_count"]
+            row_count = table_info["row_count"]
             sample_block = (
                 f"\n/*\n{row_count:,} rows from {table_name} table:\n"
                 + header + "\n"
