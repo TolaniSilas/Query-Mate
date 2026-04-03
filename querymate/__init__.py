@@ -3,23 +3,25 @@ querymate is a natural language Python package for querying relational databases
 MySQL, PostgreSQL, and SQLite, and enforces security at both the 'connection' level and 'type of query' 
 level - ensuring only safe, read-only operations reach your database.
 
-usage:
+
+how to use:
     from querymate import QueryMate
 
-    qm = QueryMate(
+    query_mate = QueryMate(
         database_url = "postgresql://user:password@host/dbname?sslmode=require",
         db_type = "postgresql",
     )
 
-    result = qm.ask("which merchant had the highest revenue last month?")
+    result = query_mate.ask("which merchant had the highest revenue last month?")
 
     print(result.answer)    # this is the natural language answer
     print(result.sql)       # the SQL that was generated and executed
     print(result.rows)      # raw result rows
     print(result.status)    # "ok" | "cannot_answer" | "validation_failed" | "error"
 
-    qm.disconnect()  # this terminates the database connection.
+    query_mate.disconnect()  # this terminates the database connection.
 """
+
 
 import uuid
 from querymate.core.connection import connect, disconnect, get_session
@@ -40,7 +42,7 @@ class QueryResult:
         self.answer = data.get("answer")
         self.sql = data.get("sql")
         self.rows = data.get("rows")
-        self.row_count = data.get("row_count", 0)
+        self.row_count= data.get("row_count", 0)
         self.truncated = data.get("truncated", False)
         self.attempts = data.get("attempts", 1)
         self.status = data.get("status")
@@ -58,32 +60,25 @@ class QueryResult:
 
 class QueryMate:
     """
-    the main entry point for the querymate package.
-
-    connects to a database once, caches the schema, and exposes a single
-    .ask() method that converts natural language questions into answers.
+    the main entry point for the querymate package. it connects to a database once, caches 
+    the schema, and exposes a single .ask() method that converts natural language questions into answers.
 
     parameters
-    ----------
-    database_url : full connection URL for postgresql or mysql.
-                   for sqlite, pass the file path via sqlite_path instead.
-    db_type      : "postgresql" | "mysql" | "sqlite"
-    sqlite_path  : absolute path to the sqlite file (sqlite only)
+        database_url: full connection URL for postgresql or mysql.
+                    for sqlite, pass the file path via sqlite_path instead.
+        db_type: "postgresql" | "mysql" | "sqlite"
+        sqlite_path: absolute path to the sqlite file (sqlite only)
 
     
     for usage, here is an instance: 
-    -------
-    # postgresql / mysql
-    qm = QueryMate(
-        database_url = "postgresql://user:pass@host/dbname?sslmode=require",
-        db_type = "postgresql",
-    )
+        # postgresql / mysql
+        query_mate = QueryMate(database_url = "postgresql://user:pass@host/dbname?sslmode=require",
+            db_type = "postgresql",
+        )
 
-    # sqlite
-    qm = QueryMate(
-        db_type = "sqlite",
-        sqlite_path = "/path/to/database.sqlite",
-    )
+        # sqlite
+        query_mate = QueryMate(db_type = "sqlite", sqlite_path = "/path/to/database.sqlite",
+        )
     """
 
     def __init__(self, db_type: str, database_url: str | None = None, sqlite_path: str | None = None):
@@ -117,20 +112,17 @@ class QueryMate:
 
     def ask(self, question: str) -> QueryResult:
         """
-        converts a natural language question into an answer.
+        query the databas with natural language  and return an answer.
 
         parameters
-        ----------
-        question : plain english question about the connected database
+            question: plain english question about the connected database
 
         returns
-        -------
-        QueryResult with .answer, .sql, .rows, .status, .error
+            QueryResult with .answer, .sql, .rows, .status, .error
 
         raises
-        ------
-        RuntimeError   if called after disconnect()
-        ValueError     if question is empty
+            RuntimeError: if called after disconnect()
+            ValueError: if question is empty
         """
         
         if not self._connected:
@@ -178,14 +170,9 @@ class QueryMate:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """
-        this supports usage as a context manager:
-
-        with QueryMate(...) as qm:
-            result = qm.ask("your question")
-
+        for usage as a context manager:
         """
 
-        # terminate the database connection.
         self.disconnect() 
 
 

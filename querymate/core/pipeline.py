@@ -1,22 +1,31 @@
 """
-this is the main orchestrator. it wires all agents together into a single call.
+this is the main orchestrator. it wires or connects all agents together into a single call.
 
-full flow:
-    question
-    --> [SQL Agent]         NL --> SQL (with retry loop)
-        --> [Validator Agent]   quality + intent check (runs inside sql agent loop)
-    --> [query_validator]   security check (SELECT-only enforcement)
-    --> [executor]          run SQL on DB
-    --> [Response Agent]    results --> natural language answer
+full flow logic or idea:
+    question: Qustion from Users or Client
+    --> [SQL Agent]: collects natural language (NL) and returns SQL (with retry loop)
+
+    --> Validator Gate: 
+        --> [Validator Agent]: quality + intent check for generated SQL query (runs inside sql agent loop); this is solely to
+            confirm if the generated SQL command could execute or fulfils the user question and satifsy the DB.
+        --> [query_validator]: security check (SELECT-only enforcement). It enforces ONLY 'SELECT' statements to 
+            execute, all other statement command won't run.
+
+    --> [executor]: run the validated SQL query on DB.
+
+    --> [Response Agent]: return results in natural language.
+
+    
+    see the readme for the system design or achitecture diagram.
 """
 
 
-from core.logger import get_logger
-from agents.sql_agent import run_sql_agent
-from agents.validator_agent import validator_agent
-from agents.response_agent import generate_response
-from core.connection import execute_query
-from core.query_validator import is_safe_query
+from querymate.core.logger import get_logger
+from querymate.agents.sql_agent import run_sql_agent
+from querymate.agents.validator_agent import validator_agent
+from querymate.agents.response_agent import generate_response
+from querymate.core.connection import execute_query
+from querymate.core.query_validator import is_safe_query
 
 
 
@@ -25,27 +34,25 @@ logger = get_logger(__name__)
 
 def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: str) -> dict:
     """
-    runs the full natural language --> SQL --> validate --> execute --> respond pipeline.
+    run the full multi-step agent pipeline.
 
     parameters
-    ----------
-    question      : user's natural language question
-    schema_prompt : CREATE TABLE-style schema string from schema_inspector
-    db_type       : "sqlite" | "postgresql" | "mysql"
-    session_id    : active session id for query execution
+        question: user's natural language question
+        schema_prompt: CREATE TABLE-style schema string from schema_inspector
+        db_type: "sqlite" | "postgresql" | "mysql"
+        session_id: active session id for query execution
 
     returns
-    -------
-    {
-        "answer":    str,        # natural language answer shown to the user
-        "sql":       str | None, # the SQL that was generated and executed
-        "rows":      list | None,# raw result rows (for UI table display)
-        "row_count": int,
-        "truncated": bool,       # True if rows were capped for LLM
-        "attempts":  int,        # how many SQL generation attempts were made
-        "status":    str,        # "ok" | "cannot_answer" | "security_rejected" | ...
-        "error":     str | None,
-    }
+        {
+            "answer": str,     
+            "sql": str | None, 
+            "rows": list | None,
+            "row_count": int,
+            "truncated": bool,  
+            "attempts": int,
+            "status": str, 
+            "error": str | None,
+        }
     """
 
     logger.info("pipeline | starting | question: %s", question)
@@ -65,10 +72,8 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
                 "error": f"SECURITY_REJECTED: {reason}"
             }
 
-        # query is safe - execute on the actual database.
         return execute_query(sql, session_id)
 
-    # run the SQL Agent (includes Validator Agent retry loop).
     sql_result = run_sql_agent(
         question = question,
         schema_prompt = schema_prompt,
@@ -77,13 +82,11 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
         executor_fn = safe_executor,
     )
 
-    # surface security rejections clearly in the status.
     if sql_result["status"] == "ok" and "SECURITY_REJECTED" in str(sql_result.get("error", "")):
         sql_result["status"] = "security_rejected"
 
     logger.info("pipeline | sql_result status: %s | attempts: %s", sql_result["status"], sql_result.get("attempts"))
 
-    # pass everything to the Response Agent.
     response = generate_response(
         question = question,
         sql = sql_result.get("sql") or "",

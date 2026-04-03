@@ -1,41 +1,16 @@
-"""
-secure credential handling for all three supported database types.
-
-core principle: credentials are loaded from environment variables only.
-for postgresql and mysql, just set DATABASE_URL — nothing else needed.
-for sqlite, set DB_SQLITE_PATH.
-"""
-
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
 
-# load .env file if present. (in prod - use real secrets manager).
 load_dotenv()
 
-
-# supported DB types
 SUPPORTED_DB_TYPES = {"sqlite", "postgresql", "mysql"}
-
 
 
 def get_db_credentials(db_type: str) -> dict:
     """
     loads and returns database credentials from environment variables.
-
-    parameters
-    ----------
-    db_type : "sqlite" | "postgresql" | "mysql"
-
-    returns
-    -------
-    dict of credentials ready to pass into connection.connect()
-
-    raises
-    ------
-    ValueError: if db_type is not supported
-    KeyError: if a required env var is missing
     """
 
     db_type = db_type.lower().strip()
@@ -49,24 +24,13 @@ def get_db_credentials(db_type: str) -> dict:
     if db_type == "sqlite":
         return _load_sqlite_credentials()
 
-    # for postgresql and mysql, use DATABASE_URL directly. SQLAlchemy handles everything — sslmode, channel_binding, and all query params.
     return {"url": _require_env("DATABASE_URL")}
-
 
 
 def validate_env(db_type: str) -> dict:
     """
-    checks that all required env vars are present for the given db_type
-    without actually returning their values. useful for a health-check
-    endpoint at startup.
-
-    returns
-    -------
-    {
-        "valid": bool,
-        "missing": [str, ...],
-        "db_type": str
-    }
+    checks that all required env vars are present for the given db_type without actually returning their values. 
+    useful for a health-check endpoint at startup.
     """
 
     db_type = db_type.lower().strip()
@@ -78,7 +42,6 @@ def validate_env(db_type: str) -> dict:
         "missing": missing,
         "db_type": db_type,
     }
-
 
 
 # credential loaders.
@@ -93,7 +56,6 @@ def _load_sqlite_credentials() -> dict:
         )
 
     return {"database": str(resolved)}
-
 
 
 # helpers.

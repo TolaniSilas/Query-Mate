@@ -13,10 +13,7 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
             PostgreSQL --> "postgresql://user:password@host:5432/dbname"
             MySQL --> "mysql+pymysql://user:password@host:3306/dbname"
     """
-
     
-    # the same four inspector calls work for SQLite, PostgreSQL, and MySQL.
-    # SQLAlchemy handles all dialect differences internally.
     engine = create_engine(connection_string)
     inspector = inspect(engine)
     db_type = engine.dialect.name  # "sqlite" or "postgresql" or "mysql"
@@ -27,7 +24,6 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
 
     for table in tables:
 
-        # get_columns --> name, type, nullable, default, primary_key.
         raw_columns = inspector.get_columns(table)
         columns: dict[str, dict] = {}
 
@@ -40,14 +36,12 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
                 "foreign_key": None,  # filled in below
             }
 
-        # get_pk_constraint to get which columns form the primary key.
         pk_constraint = inspector.get_pk_constraint(table)
 
         for pk_col in pk_constraint.get("constrained_columns", []):
             if pk_col in columns:
                 columns[pk_col]["primary_key"] = True
 
-        # get_foreign_keys: the keys with relationships to other tables.
         raw_fks = inspector.get_foreign_keys(table)
         foreign_keys = []
 
@@ -62,11 +56,9 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
                     "on_delete": fk.get("options", {}).get("ondelete", "NO ACTION"),
                 })
 
-                # also annotate the column directly for quick lookup.
                 if local_col in columns:
                     columns[local_col]["foreign_key"] = f"{fk['referred_table']}.{ref_col}"
 
-        # get_indexes: this is for names, uniqueness, columns covered.
         raw_indexes = inspector.get_indexes(table)
         indexes = [
             {
@@ -77,11 +69,9 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
             for idx in raw_indexes
         ]
 
-        # row count
         with engine.connect() as conn:
             row_count = conn.execute(text(f"SELECT COUNT(*) FROM {table}")).scalar()
 
-        # extract top 3 sample rows.
         with engine.connect() as conn:
             result = conn.execute(text(f"SELECT * FROM {table} LIMIT {sample_rows}"))
             col_names = list(result.keys())
@@ -100,8 +90,6 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
             "sample_rows": rows,
         }
 
-
-    # actively close out connections that are present in the pool and not checked out.
     engine.dispose()
 
     return schema
@@ -109,8 +97,7 @@ def inspect_database(connection_string: str, sample_rows: int = 3) -> dict:
 
 
 def build_llm_prompt(schema: dict) -> str:
-    # renders each table as a CREATE TABLE statement + sample rows block.
-    # this format is far more readable (eventually better) for LLMs compared to the raw JSON/dict output.
+
     blocks = []
 
     for table_name, table_info in schema["tables"].items():
@@ -118,7 +105,6 @@ def build_llm_prompt(schema: dict) -> str:
         constraint_lines = []
 
         for col_name, col in table_info["columns"].items():
-            # build the column definition line
             parts = [f"\t{col_name}", col["type"]]
 
             if not col["nullable"]:
@@ -128,7 +114,6 @@ def build_llm_prompt(schema: dict) -> str:
 
             col_lines.append(" ".join(parts))
 
-        # primary key constraint.
         pk_cols = table_info["primary_key"]["constrained_columns"]
         pk_name = table_info["primary_key"].get("name") or f"{table_name}_pkey"
 
@@ -137,7 +122,6 @@ def build_llm_prompt(schema: dict) -> str:
                 f"\tCONSTRAINT {pk_name} PRIMARY KEY ({', '.join(pk_cols)})"
             )
 
-        # foreign key constraints.
         for fk in table_info["foreign_keys"]:
             fk_def = (
                 f"\tFOREIGN KEY ({fk['constrained_column']}) "
@@ -145,7 +129,6 @@ def build_llm_prompt(schema: dict) -> str:
             )
             constraint_lines.append(fk_def)
 
-        # assemble CREATE TABLE block.
         all_lines = col_lines + constraint_lines
         create_block = (
             f"CREATE TABLE {table_name} (\n"
@@ -153,7 +136,6 @@ def build_llm_prompt(schema: dict) -> str:
             + "\n)"
         )
 
-        # indexes block (non-unique ones are still useful context)
         index_lines = []
         for idx in table_info["indexes"]:
             unique_kw = "UNIQUE " if idx["unique"] else ""
@@ -161,7 +143,6 @@ def build_llm_prompt(schema: dict) -> str:
                 f"CREATE {unique_kw}INDEX {idx['name']} ON {table_name} ({', '.join(idx['columns'])})"
             )
 
-        # sample rows block as a tab-separated table
         sample_block = ""
         if table_info["sample_rows"]:
             col_names = list(table_info["columns"].keys())
@@ -178,7 +159,6 @@ def build_llm_prompt(schema: dict) -> str:
                 + "\n*/"
             )
 
-        # combine everything for this table.
         table_block = create_block
         if index_lines:
             table_block += "\n" + "\n".join(index_lines)

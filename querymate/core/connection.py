@@ -4,7 +4,7 @@ database connection manager for SQLite, PostgreSQL, and MySQL.
 responsibilities:
   - build and validate connections for all three supported DB types
   - cache the active engine + schema per session (inspect once, reuse always)
-  - enforce read-only access at the connection level
+  - enforce read-only access at the connection level for secure DB purposes.
   - execute queries safely and return serialisable results
   - clean up connections on disconnect
 
@@ -23,9 +23,10 @@ from uuid import UUID
 from typing import Any
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.engine import Engine
-from core.schema_inspector import get_schema_and_prompt
-from core.logger import get_logger
-
+# from core.schema_inspector import get_schema_and_prompt
+# from core.logger import get_logger
+from querymate.core.schema_inspector import get_schema_and_prompt
+from querymate.core.logger import get_logger
 
 
 logger = get_logger(__name__)
@@ -38,7 +39,6 @@ _sessions: dict[str, dict] = {}
 
 
 
-# connection builders - one per supported DB type.
 def _build_sqlite_engine(database: str) -> Engine:
     """
     enforce read-only at the SQLite URI level.
@@ -74,30 +74,26 @@ def _build_url_engine(url: str, db_type: str) -> Engine:
 
 
 
-# public api.
 def connect(session_id: str, db_type: str, credentials: dict) -> dict:
     """
-    establishes a DB connection, inspects the schema, and caches everything
-    under the given session_id.
+    establishes a DB connection, inspects the schema, and caches everything under the given session_id.
 
     parameters
-    ----------
-    session_id  : unique identifier for this user session
-    db_type     : "sqlite" | "postgresql" | "mysql"
-    credentials : dict of connection parameters
+        session_id: unique identifier for this user session
+        db_type: "sqlite" | "postgresql" | "mysql"
+        credentials: dict of connection parameters
 
-        SQLite:     { "database": "/path/to/file.db" }
-        PostgreSQL / MySQL: { "url": "DATABASE_URL" }
+            SQLite:{ "database": "/path/to/file.db" }
+            PostgreSQL / MySQL: { "url": "DATABASE_URL" }
 
     returns
-    -------
-    {
-        "status":      "ok" | "error",
-        "db_type":     str,
-        "table_count": int,
-        "tables":      [str, ...],
-        "error":       str | None
-    }
+        {
+            "status": "ok" | "error",
+            "db_type": str,
+            "table_count": int,
+            "tables": [str, ...],
+            "error": str | None
+        }
     """
 
     try:
@@ -185,17 +181,15 @@ def execute_query(sql: str, session_id: str) -> dict:
     executes a SQL query on the session's cached engine.
 
     parameters
-    ----------
-    sql        : a validated SELECT query
-    session_id : the active session
+        sql: a validated SELECT query
+        session_id: the active session
 
     returns
-    -------
-    {
-        "rows":    list[dict] | None,
-        "columns": list[str] | None,
-        "error":   str | None
-    }
+        {
+            "rows": list[dict] | None,
+            "columns": list[str] | None,
+            "error": str | None
+        }
     """
     
     session = get_session(session_id)

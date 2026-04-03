@@ -1,19 +1,18 @@
 """
-single entry point for all LLM calls across the system.
-supports four providers: Anthropic, OpenAI, Groq, and Google Gemini.
+single entry point for all LLM calls across the system. it supports four providers: Anthropic, OpenAI, Google Gemini, and Groq.
 
-only API keys are loaded from the environment - provider and model
-are set directly in each agent's code.
+only API keys are loaded from the environment - provider and 'type' of model are automatically st and could be altered by entering different
+model iD as agent attribute. 
 
 supported providers:
-    anthropic -> claude-sonnet-4-20250514, claude-opus-4-6, etc.
-    openai -> gpt-4o, gpt-4o-mini, etc.
+    anthropic -> claude-opus-4-6, claude-sonnet-4-6 and so on.
+    openai -> gpt-4o, gpt-4o-mini, and other variants.
     groq -> llama-3.3-70b-versatile, llama-3.1-8b-instant, etc.
     gemini -> gemini-2.0-flash, gemini-1.5-pro, etc.
 """
 
 import os
-from core.logger import get_logger
+from querymate.core.logger import get_logger
 import anthropic
 from openai import OpenAI
 from groq import Groq
@@ -27,23 +26,22 @@ SUPPORTED_PROVIDERS = {"anthropic", "openai", "groq", "gemini"}
 
 
 def chat(system: str, user: str, max_tokens: int = 1024,
-         provider: str = "anthropic", model: str = "claude-sonnet-4-20250514") -> str:
+         provider: str = "anthropic", model: str = "claude-opus-4-6") -> str:
     """
     sends a system + user message to the configured LLM provider.
     returns the response text as a string.
 
     parameters
-    ----------
-    system     : system prompt
-    user       : user message
-    max_tokens : max tokens for the response
-    provider   : "anthropic" | "openai" | "groq" | "gemini"
-    model      : the model name for the chosen provider
+        system: system prompt
+        user: user message
+        max_tokens: max tokens for the response
+        provider: "anthropic" | "openai" | "groq" | "gemini"
+        model: the model name for the chosen provider
 
     raises
-    ------
-    ValueError   if the provider is not supported
+        ValueError: if the provider is not supported
     """
+
     provider = provider.lower()
 
     if provider not in SUPPORTED_PROVIDERS:
@@ -68,7 +66,6 @@ def chat(system: str, user: str, max_tokens: int = 1024,
 
 
 
-# provider implementations.
 def _anthropic(system: str, user: str, max_tokens: int, model: str) -> str:
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
@@ -78,7 +75,7 @@ def _anthropic(system: str, user: str, max_tokens: int, model: str) -> str:
             max_tokens = max_tokens,
             system = system,
             messages = [{"role": "user", "content": user}],
-        )
+            )
         return response.content[0].text.strip()
 
     except anthropic.APIConnectionError as e:
