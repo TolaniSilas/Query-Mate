@@ -23,8 +23,6 @@ from uuid import UUID
 from typing import Any
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.engine import Engine
-# from core.schema_inspector import get_schema_and_prompt
-# from core.logger import get_logger
 from querymate.core.schema_inspector import get_schema_and_prompt
 from querymate.core.logger import get_logger
 
@@ -243,86 +241,86 @@ def _serialize(value: Any) -> Any:
 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    import os
-    from dotenv import load_dotenv
-    import sys
-    from core.query_validator import is_safe_query
+#     import os
+#     from dotenv import load_dotenv
+#     import sys
+#     from core.query_validator import is_safe_query
 
-    load_dotenv()
+#     load_dotenv()
 
-    SESSION_ID = "test-session-123"
+#     SESSION_ID = "test-session-123"
 
-    # connect to a database.
-    print("connecting...")
-    conn_result = connect(
-        session_id = SESSION_ID,
-        db_type = "postgresql",
-        credentials = {"url": os.environ["DATABASE_URL"]},
-    )
+#     # connect to a database.
+#     print("connecting...")
+#     conn_result = connect(
+#         session_id = SESSION_ID,
+#         db_type = "postgresql",
+#         credentials = {"url": os.environ["DATABASE_URL"]},
+#     )
 
-    print()
-    print(f"status: {conn_result['status']}")
-    print(f"table_count: {conn_result['table_count']}")
-    print(f"tables: {conn_result['tables']}")
-    print(f"error: {conn_result['error']}")
-    print()
-    print()
+#     print()
+#     print(f"status: {conn_result['status']}")
+#     print(f"table_count: {conn_result['table_count']}")
+#     print(f"tables: {conn_result['tables']}")
+#     print(f"error: {conn_result['error']}")
+#     print()
+#     print()
 
-    if conn_result["status"] != "ok":
-        print("connection failed — aborting.")
-        sys.exit(1)
+#     if conn_result["status"] != "ok":
+#         print("connection failed — aborting.")
+#         sys.exit(1)
     
 
-    # execute query.
-    print("executing query...")
-    sql = """
-        SELECT merchant_id, SUM(amount) AS total
-        FROM merchant_activities
-        WHERE status = 'SUCCESS'
-        GROUP BY merchant_id
-        ORDER BY SUM(amount) DESC
-        LIMIT 1
-    """
+#     # execute query.
+#     print("executing query...")
+#     sql = """
+#         SELECT merchant_id, SUM(amount) AS total
+#         FROM merchant_activities
+#         WHERE status = 'SUCCESS'
+#         GROUP BY merchant_id
+#         ORDER BY SUM(amount) DESC
+#         LIMIT 1
+#     """
 
 
-    def safe_executor(sql: str) -> dict:
-        """
-        security gate for rejecting anything that isn't a SELECT before hitting the DB.
-        this idea is intentionally separate or different from the Validator Agent (which is quality for query validation, not security).
-        this safe executor is for security check.
-        """
+#     def safe_executor(sql: str) -> dict:
+#         """
+#         security gate for rejecting anything that isn't a SELECT before hitting the DB.
+#         this idea is intentionally separate or different from the Validator Agent (which is quality for query validation, not security).
+#         this safe executor is for security check.
+#         """
 
-        safe, reason = is_safe_query(sql)
-        if not safe:
-            logger.warning("pipeline | security_rejected | reason: %s", reason)
-            return {
-                "rows": None,
-                "error": f"SECURITY_REJECTED: {reason}"
-            }
+#         safe, reason = is_safe_query(sql)
+#         if not safe:
+#             logger.warning("pipeline | security_rejected | reason: %s", reason)
+#             return {
+#                 "rows": None,
+#                 "error": f"SECURITY_REJECTED: {reason}"
+#             }
 
-        # query is safe - execute on the actual database.
-        return execute_query(sql, SESSION_ID)
+#         # query is safe - execute on the actual database.
+#         return execute_query(sql, SESSION_ID)
     
     
-    exe_query = safe_executor(sql)
+#     exe_query = safe_executor(sql)
 
-    if exe_query["error"]:
-        print(f"error: {exe_query['error']}")
-        print(f"rows: {exe_query['rows']}")
+#     if exe_query["error"]:
+#         print(f"error: {exe_query['error']}")
+#         print(f"rows: {exe_query['rows']}")
         
-    else:
-        print()
-        print(f"columns: {exe_query['columns']}")
-        print(f"rows: {exe_query['rows']}")
-        print(f"error: {exe_query['error']}")
-        print()
-        print()
+#     else:
+#         print()
+#         print(f"columns: {exe_query['columns']}")
+#         print(f"rows: {exe_query['rows']}")
+#         print(f"error: {exe_query['error']}")
+#         print()
+#         print()
 
 
-    # disconnect from the databse.
-    print("disconnecting...")
-    disc_result = disconnect(SESSION_ID)
-    print()
-    print(f"status: {disc_result['status']}")
+#     # disconnect from the databse.
+#     print("disconnecting...")
+#     disc_result = disconnect(SESSION_ID)
+#     print()
+#     print(f"status: {disc_result['status']}")

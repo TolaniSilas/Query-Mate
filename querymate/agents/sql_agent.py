@@ -3,7 +3,6 @@ this converts a natural language question into a sql query using the LLM.
 and accepts feedback from the validator agent and retries if needed.
 """
 
-
 import re
 from querymate.core.llm import chat
 from querymate.core.logger import get_logger
@@ -63,9 +62,9 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
 
     parameters
     ----------
-    question : the user's natural language question
+    question: the user's natural language question
     schema_prompt : the CREATE TABLE-style schema string from schema_inspector
-    db_type : "sqlite" | "postgresql" | "mysql"
+    db_type: "sqlite" | "postgresql" | "mysql"
     feedback: optional rejection reason from the Validator Agent (retry path)
 
     returns
@@ -132,11 +131,11 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
         up to max_retries times before returning a failure.
 
     parameters
-        question : user's natural language question
-        schema_prompt : schema context string
-        db_type : database dialect
-        validator_fn : validator_agent.validate(question, sql, schema_prompt) -> dict
-        executor_fn : executes SQL, returns {"rows": [...], "error": str | None}
+        question: user's natural language question
+        schema_prompt: schema context string
+        db_type: database dialect
+        validator_fn: validator_agent.validate(question, sql, schema_prompt) -> dict
+        executor_fn: executes SQL, returns {"rows": [...], "error": str | None}
 
     returns format
         {

@@ -17,8 +17,6 @@ import sqlglot
 import sqlglot.expressions as exp
 from sqlglot.errors import ParseError
 
-
-# keywords that should never appear in a safe read-only query.
 FORBIDDEN_KEYWORDS = {
     "INSERT", "UPDATE", "DELETE", "MERGE", "UPSERT", "REPLACE",
     "CREATE", "DROP", "ALTER", "TRUNCATE", "RENAME",
@@ -27,7 +25,6 @@ FORBIDDEN_KEYWORDS = {
     "COPY", "VACUUM", "REINDEX", "CLUSTER",
 }
 
-# functions that could be used to read files or execute OS commands.
 FORBIDDEN_FUNCTIONS = {
     "pg_read_file", "pg_ls_dir", "pg_read_binary_file",
     "pg_stat_file", "lo_import", "lo_export",

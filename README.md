@@ -84,11 +84,11 @@ User Question
 
 
 
-# all tests
+## all tests
 uv run pytest tests/ -v
 
-# just the package tests
+## just the package tests
 uv run pytest tests/querymate/ -v
 
-# just the API tests
+## just the API tests
 uv run pytest tests/api/ -v

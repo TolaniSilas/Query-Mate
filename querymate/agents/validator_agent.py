@@ -12,8 +12,6 @@ it checks:
 if it rejects, it returns specific feedback so the SQL Agent can self-correct.
 """
 
-
-
 from querymate.core.llm import chat
 from querymate.core.logger import get_logger
 

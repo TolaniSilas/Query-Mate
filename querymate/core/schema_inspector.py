@@ -170,15 +170,11 @@ def build_llm_prompt(schema: dict) -> str:
 
 
 
-connection_string = "postgresql://neondb_owner:npg_0BIGLmyafP8F@ep-green-cake-aixp8d41-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-
-
 def get_schema_and_prompt(connection_string: str, sample_rows: int = 2) -> tuple[dict, str]:
-
     schema = inspect_database(connection_string, sample_rows=sample_rows)
     prompt = build_llm_prompt(schema)
     return schema, prompt
 
-# schema, prompt = get_schema_and_prompt("https://storage.googleapis.com/benchmarks-artifacts/chinook/Chinook.db")
+# # schema, prompt = get_schema_and_prompt("https://storage.googleapis.com/benchmarks-artifacts/chinook/Chinook.db")
 
-# print(prompt)
+# # print(prompt)

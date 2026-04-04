@@ -3,12 +3,9 @@ this agent takes raw sql query results and converts them into a natural language
 the LLM synthesises the data into insight; it never lists rows or exposes sql.
 """
 
-
-
 import json
 from querymate.core.llm import chat
 from querymate.core.logger import get_logger
-
 
 
 logger = get_logger(__name__)

@@ -12,7 +12,7 @@ query_mate = QueryMate(
     )
 
 
-result = query_mate.ask("list top five merchant who had the highest revenue? don't forget the currency is in naira")
+result = query_mate.ask("look at this database and tell me the type of questions that could be asked?")
 
 print(result.answer)  
 print("======================")
