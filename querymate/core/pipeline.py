@@ -26,6 +26,7 @@ from querymate.agents.validator_agent import validator_agent
 from querymate.agents.response_agent import generate_response
 from querymate.core.connection import execute_query
 from querymate.core.query_validator import is_safe_query
+from querymate.security.guardrails import validate_question, GuardrailViolation
 
 
 
@@ -36,7 +37,7 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
     """
     run the full multi-step agent pipeline.
 
-    parameters
+    params
         question: user's natural language question
         schema_prompt: CREATE TABLE-style schema string from schema_inspector
         db_type: "sqlite" | "postgresql" | "mysql"
@@ -56,6 +57,36 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
     """
 
     logger.info("pipeline | starting | question: %s", question)
+
+    try:
+        question = validate_question(question)
+        
+    except GuardrailViolation as e:
+        logger.warning("pipeline | guardrail violation | reason: %s", str(e))
+        return {
+            "answer": str(e),
+            "sql": None,
+            "rows": None,
+            "row_count": 0,
+            "truncated": False,
+            "attempts": 0,
+            "status": "guardrail_violation",
+            "error": str(e),
+        }
+    
+    except ValueError as e:
+        logger.warning("pipeline | invalid question | reason: %s", str(e))
+        return {
+            "answer": str(e),
+            "sql": None,
+            "rows": None,
+            "row_count": 0,
+            "truncated": False,
+            "attempts": 0,
+            "status": "error",
+            "error": str(e),
+        }
+    
 
     def safe_executor(sql: str) -> dict:
         """

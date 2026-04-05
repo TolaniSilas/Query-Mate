@@ -11,15 +11,6 @@ it defends and protects against the attack types documented in the OWASP LLM che
     - role override or jailbreak attempts (DAN, developer mode, grandmother trick)
     - HTML/Markdown injection
     - excessive length attacks
-
-flow in pipeline.py:
-    user question
-        --> validate_question() (this module - input gate)
-        --> SQL Agent
-        --> Validator Agent
-        --> Security Gate
-        --> DB Execution
-        --> Response Agent
 """
 
 import re

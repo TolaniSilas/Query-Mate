@@ -147,7 +147,7 @@ class QueryMate:
             question = question,
             schema_prompt = session["schema_prompt"],
             db_type = self._db_type,
-            session_id = self._session_id,
+            session_id = self._session_id
         )
 
         return QueryResult(result)
