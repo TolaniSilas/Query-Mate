@@ -6,6 +6,7 @@ and accepts feedback from the validator agent and retries if needed.
 import re
 from querymate.core.llm import chat
 from querymate.core.logger import get_logger
+from querymate.security.guardrails import INJECTION_GUARD
 
 
 logger = get_logger(__name__)
@@ -13,7 +14,9 @@ max_retries = 3
 
 
 def _build_system_prompt(schema_prompt: str, db_type: str) -> str:
-    return f"""You are an expert {db_type.upper()} SQL query writer embedded in an intelligent Text-to-SQL system.
+    return f"""{INJECTION_GUARD}
+    
+    You are an expert {db_type.upper()} SQL query writer embedded in an intelligent Text-to-SQL system.
     
     This system serves non-technical business users — stakeholders, analysts, and executives — who interact
     with their relational databases using plain English. They have no SQL knowledge. Your job is to silently
