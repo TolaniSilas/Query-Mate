@@ -175,6 +175,6 @@ def get_schema_and_prompt(connection_string: str, sample_rows: int = 2) -> tuple
     prompt = build_llm_prompt(schema)
     return schema, prompt
 
-# # schema, prompt = get_schema_and_prompt("https://storage.googleapis.com/benchmarks-artifacts/chinook/Chinook.db")
+# schema, prompt = get_schema_and_prompt("https://storage.googleapis.com/benchmarks-artifacts/chinook/Chinook.db")
 
-# # print(prompt)
+# print(prompt)

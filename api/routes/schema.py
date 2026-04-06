@@ -1,7 +1,7 @@
 """
 this helps to returns the cached schema for an active session.
 
-    GET  /api/schema?session_id=xxx  --> full schema dict + prompt
+    GET /api/schema?session_id=xxx  --> full schema dict + prompt
 """
 
 from fastapi import APIRouter

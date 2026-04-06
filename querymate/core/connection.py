@@ -76,7 +76,7 @@ def connect(session_id: str, db_type: str, credentials: dict) -> dict:
     """
     establishes a DB connection, inspects the schema, and caches everything under the given session_id.
 
-    parameters
+    params
         session_id: unique identifier for this user session
         db_type: "sqlite" | "postgresql" | "mysql"
         credentials: dict of connection parameters
@@ -138,7 +138,7 @@ def connect(session_id: str, db_type: str, credentials: dict) -> dict:
 
     except Exception as e:
         logger.error("connection | failed to connect | session: %s | error: %s", session_id, str(e), exc_info=True)
-        return {"status": "error", "error": str(e)}
+        return {"status": "error", "error": str(e)} 
 
 
 
@@ -178,7 +178,7 @@ def execute_query(sql: str, session_id: str) -> dict:
     """
     executes a SQL query on the session's cached engine.
 
-    parameters
+    params
         sql: a validated SELECT query
         session_id: the active session
 

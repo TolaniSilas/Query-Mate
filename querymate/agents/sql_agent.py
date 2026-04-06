@@ -63,20 +63,18 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
     """
     calls the LLM to generate a SQL query for the given question.
 
-    parameters
-    ----------
-    question: the user's natural language question
-    schema_prompt : the CREATE TABLE-style schema string from schema_inspector
-    db_type: "sqlite" | "postgresql" | "mysql"
-    feedback: optional rejection reason from the Validator Agent (retry path)
+    params
+        question: the user's natural language question
+        schema_prompt : the CREATE TABLE-style schema string from schema_inspector
+        db_type: "sqlite" | "postgresql" | "mysql"
+        feedback: optional rejection reason from the Validator Agent (retry path)
 
     returns
-    -------
-    {
-        "sql": str | None,
-        "status": "ok" | "cannot_answer" | "error",
-        "error": str | None
-    }
+        {
+            "sql": str | None,
+            "status": "ok" | "cannot_answer" | "error",
+            "error": str | None
+        }
     """
 
     system_prompt = _build_system_prompt(schema_prompt, db_type)
