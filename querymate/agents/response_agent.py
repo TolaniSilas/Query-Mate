@@ -1,6 +1,10 @@
 """
 this agent takes raw sql query results and converts them into a natural language answer.
 the LLM synthesises the data into insight; it never lists rows or exposes sql.
+
+conversation_context is injected when available — the agent uses it to enrich responses
+with continuity (e.g. referencing a prior finding, framing a comparison, acknowledging
+what has already been established) but only when it genuinely adds value.
 """
 
 import json
@@ -14,8 +18,24 @@ logger = get_logger(__name__)
 max_rows_to_llm = 25
 
 
-def _build_system_prompt() -> str:
-    return """{INJECTION_GUARD}
+def _build_system_prompt(conversation_context: str | None = None) -> str:
+    context_block = ""
+    if conversation_context:
+            context_block = f"""
+        CONVERSATION HISTORY:
+        {conversation_context}
+
+        HOW TO USE THE HISTORY ABOVE:
+        - If the current answer is a continuation of a prior line of investigation, frame it accordingly.
+        For example: "Drilling down further..." or "Compared to the earlier figure of X..."
+        - If a key fact from a prior answer is relevant to contextualise this answer, reference it naturally.
+        - If the user is refining or filtering a prior result, acknowledge the progression.
+        - Do NOT repeat or summarise what was already said if it adds no new value.
+        - If the history is not relevant to the current question and result, ignore it entirely.
+        Never force a connection that isn't there.
+    """
+
+    return f"""{INJECTION_GUARD}
 
     You are a knowledgeable and articulate data analyst assistant embedded in a business intelligence tool.
     Your role is to interpret database query results and communicate findings in clear, natural, conversational English — the way a senior analyst would explain data to a business stakeholder in a meeting.
@@ -37,7 +57,7 @@ def _build_system_prompt() -> str:
     - Keep it concise. One to three sentences is often enough. Only go longer if the data genuinely warrants it.
 
     TONE: Confident, clear, professional but approachable. No jargon. No hedging. No filler phrases.
-    """
+    {context_block}"""
 
 
 def _build_results_summary(rows: list, row_count: int, truncated: bool) -> str:
@@ -54,7 +74,7 @@ def _build_results_summary(rows: list, row_count: int, truncated: bool) -> str:
 
     summary_lines = [
         f"Total records returned: {row_count}"
-        + (" (summarise from the first 50 shown below)" if truncated else ""),
+        + (" (summarise from the first 25 shown below)" if truncated else ""),
         f"Fields available: {', '.join(columns)}",
         "",
         "Data:",
@@ -64,10 +84,11 @@ def _build_results_summary(rows: list, row_count: int, truncated: bool) -> str:
     return "\n".join(summary_lines)
 
 
-def generate_response(question: str, sql: str, rows: list | None, status: str, error: str | None = None, attempts: int = 1) -> dict:
+def generate_response(question: str, sql: str, rows: list | None, status: str, error: str | None = None, attempts: int = 1, conversation_context: str | None = None) -> dict:
 
     if status == "cannot_answer":
         logger.info("response_agent | cannot_answer | question: %s", question)
+
         return {
             "answer": "That question doesn't appear to match anything in the connected database. "
             "The information may not exist in the available data, or the question may need "
@@ -79,6 +100,7 @@ def generate_response(question: str, sql: str, rows: list | None, status: str, e
 
     if status in ("validation_failed", "error"):
         logger.warning("response_agent | pipeline failed | status: %s | error: %s", status, error)
+        
         return {
             "answer": f"Something went wrong while trying to answer your question after {attempts} attempt(s). "
             "Please try rephrasing it, or contact your administrator if the problem persists.",
@@ -100,10 +122,13 @@ def generate_response(question: str, sql: str, rows: list | None, status: str, e
     )
 
     try:
-        answer = chat(system = _build_system_prompt(), user = user_content,
-                      max_tokens = 1024, provider = "anthropic",
-                      model = "claude-sonnet-4-20250514"
-                      )
+        answer = chat(
+            system=_build_system_prompt(conversation_context),
+            user=user_content,
+            max_tokens=1024,
+            provider="anthropic",
+            model="claude-sonnet-4-20250514",
+        )
 
         logger.debug("response_agent | answer generated successfully")
 
@@ -112,7 +137,7 @@ def generate_response(question: str, sql: str, rows: list | None, status: str, e
             "row_count": row_count,
             "truncated": truncated,
             "status": "ok",
-            }
+        }
 
     except Exception as e:
         logger.error("response_agent | API error during response generation: %s", str(e), exc_info=True)

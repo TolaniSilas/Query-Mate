@@ -33,7 +33,7 @@ from querymate.security.guardrails import validate_question, GuardrailViolation
 logger = get_logger(__name__)
 
 
-def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: str) -> dict:
+def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: str, conversation_context: str | None = None) -> dict:
     """
     run the full multi-step agent pipeline.
 
@@ -42,16 +42,17 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
         schema_prompt: CREATE TABLE-style schema string from schema_inspector
         db_type: "sqlite" | "postgresql" | "mysql"
         session_id: active session id for query execution
+        conversation_context: formatted history from context builder (optional)
 
     returns
         {
-            "answer": str,     
-            "sql": str | None, 
+            "answer": str,
+            "sql": str | None,
             "rows": list | None,
             "row_count": int,
-            "truncated": bool,  
+            "truncated": bool,
             "attempts": int,
-            "status": str, 
+            "status": str,
             "error": str | None,
         }
     """
@@ -111,6 +112,7 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
         db_type = db_type,
         validator_fn = lambda q, s, sp: validator_agent(q, s, sp),
         executor_fn = safe_executor,
+        conversation_context = conversation_context,
     )
 
     if sql_result["status"] == "ok" and "SECURITY_REJECTED" in str(sql_result.get("error", "")):
@@ -125,6 +127,7 @@ def run_pipeline(question: str, schema_prompt: str, db_type: str, session_id: st
         status = sql_result["status"],
         error = sql_result.get("error"),
         attempts = sql_result.get("attempts", 1),
+        conversation_context = conversation_context,
     )
 
     logger.info("pipeline | completed | status: %s", response["status"])

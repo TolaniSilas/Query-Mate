@@ -13,11 +13,22 @@ logger = get_logger(__name__)
 max_retries = 3
 
 
-def _build_system_prompt(schema_prompt: str, db_type: str) -> str:
+def _build_system_prompt(schema_prompt: str, db_type: str, conversation_context: str | None = None) -> str:
+    
+    context_block = ""
+    if conversation_context:
+        context_block = f"""
+    {conversation_context}
+
+    Use the conversation history above to resolve follow-up references. If the current question
+    refers to a previous result ("those", "them", "the same ones", "filter further"), build on
+    the prior SQL rather than starting from scratch.
+    """
+
     return f"""{INJECTION_GUARD}
-    
+
     You are an expert {db_type.upper()} SQL query writer embedded in an intelligent Text-to-SQL system.
-    
+
     This system serves non-technical business users — stakeholders, analysts, and executives — who interact
     with their relational databases using plain English. They have no SQL knowledge. Your job is to silently
     translate their intent into a precise, executable SQL query. The quality of their decision-making depends
@@ -26,7 +37,7 @@ def _build_system_prompt(schema_prompt: str, db_type: str) -> str:
     The database dialect is {db_type.upper()}. Write only syntax valid for this dialect.
 
     {schema_prompt}
-
+    {context_block}
     YOUR TASK:
     Convert the user's natural language question into a single, correct, read-only SQL SELECT query.
 
@@ -59,7 +70,7 @@ def _extract_sql(raw: str) -> str:
     return cleaned
 
 
-def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str | None = None) -> dict:
+def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str | None = None, conversation_context: str | None = None) -> dict:
     """
     calls the LLM to generate a SQL query for the given question.
 
@@ -68,6 +79,7 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
         schema_prompt : the CREATE TABLE-style schema string from schema_inspector
         db_type: "sqlite" | "postgresql" | "mysql"
         feedback: optional rejection reason from the Validator Agent (retry path)
+        conversation_context: formatted history from context builder (optional)
 
     returns
         {
@@ -77,7 +89,7 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
         }
     """
 
-    system_prompt = _build_system_prompt(schema_prompt, db_type)
+    system_prompt = _build_system_prompt(schema_prompt, db_type, conversation_context)
 
     # on a retry, append the validator's feedback so the LLM can self-correct
     user_content = question
@@ -123,7 +135,7 @@ def generate_sql(question: str, schema_prompt: str, db_type: str, feedback: str 
             }
 
 
-def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn, executor_fn) -> dict:
+def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn, executor_fn, conversation_context: str | None = None) -> dict:
     """
     orchestrates the sql generation in addition with the validation retry loop.
 
@@ -137,6 +149,7 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
         db_type: database dialect
         validator_fn: validator_agent.validate(question, sql, schema_prompt) -> dict
         executor_fn: executes SQL, returns {"rows": [...], "error": str | None}
+        conversation_context: formatted history from context builder (optional)
 
     returns format
         {
@@ -157,7 +170,7 @@ def run_sql_agent(question: str, schema_prompt: str, db_type: str, validator_fn,
 
         logger.info("sql_agent | attempt %d of %d", attempt, max_retries)
 
-        gen_result = generate_sql(question, schema_prompt, db_type, feedback)
+        gen_result = generate_sql(question, schema_prompt, db_type, feedback, conversation_context)
 
         if gen_result["status"] == "cannot_answer":
             logger.info("sql_agent | question unanswerable from schema")
