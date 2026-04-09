@@ -15,7 +15,7 @@ from querymate.core.logger import get_logger
 logger = get_logger(__name__)
 
 # number of recent messages to retrieve for context injection.
-CONTEXT_WINDOW = 20
+CONTEXT_WINDOW = 50
 
 
 @contextmanager
