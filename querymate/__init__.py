@@ -113,13 +113,21 @@ class QueryMate:
 
         logger.info("querymate | initialising | user: %s | db_type: %s", self._user_id, self._db_type)
 
-        # initialise memory store tables (safe to call every time; no-op is performed if tables exist).
-        create_tables()
-
-        # register user (upsert), close any prior active session, open a new one.
-        ensure_user(self._user_id)
-        close_active_session(self._user_id)
-        create_session(self._user_id, self._session_id)
+        # initialise memory store and session cache.
+        # errors here are caught and re-raised with clear, actionable messages.
+        try:
+            create_tables()
+            ensure_user(self._user_id)
+            close_active_session(self._user_id)
+            create_session(self._user_id, self._session_id)
+        except ConnectionError:
+            raise
+        except Exception as e:
+            raise ConnectionError(
+                f"QueryMate failed to initialise the memory store or session cache.\n"
+                f"Ensure MEMORY_DATABASE_URL and REDIS_URL are correctly set in your .env.\n"
+                f"Error: {e}"
+            ) from e
 
         result = connect(
             session_id = self._session_id,
