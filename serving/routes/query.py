@@ -6,7 +6,7 @@ runs the full pipeline, and returns the answer.
 """
 
 from fastapi import APIRouter
-from api.schemas.models import QueryRequest, QueryResponse
+from serving.schemas.models import QueryRequest, QueryResponse
 from querymate.core.connection import get_session
 from querymate.core.pipeline import run_pipeline
 from querymate.core.logger import get_logger
@@ -27,7 +27,7 @@ def query_database(request: QueryRequest):
     session = get_session(request.session_id)
 
     if not session:
-        logger.warning("api | query | session not found: %s", request.session_id)
+        logger.warning("serving | query | session not found: %s", request.session_id)
         return QueryResponse(
             status = "error",
             answer = None,
@@ -39,7 +39,7 @@ def query_database(request: QueryRequest):
             error = "Session not found. Please reconnect to the database.",
         )
 
-    logger.info("api | query | session: %s | question: %s", request.session_id, request.question)
+    logger.info("serving | query | session: %s | question: %s", request.session_id, request.question)
 
     result = run_pipeline(question = request.question, 
                           schema_prompt = session["schema_prompt"], 

@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 # request logging middleware.
 def test_request_logging_middleware_logs_requests(caplog):
     import logging
-    from api.main import app
+    from serving.main import app
 
     client = TestClient(app)
 
@@ -27,7 +27,7 @@ def test_request_logging_middleware_logs_requests(caplog):
 
 def test_request_logging_middleware_logs_status_code(caplog):
     import logging
-    from api.main import app
+    from serving.main import app
 
     client = TestClient(app)
 
@@ -42,7 +42,7 @@ def test_request_logging_middleware_logs_status_code(caplog):
 def test_global_exception_handler_returns_clean_json():
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
-    from api.main import global_exception_handler
+    from serving.main import global_exception_handler
 
     # create a minimal app that always raises
     test_app = FastAPI()
@@ -64,7 +64,7 @@ def test_global_exception_handler_returns_clean_json():
 def test_global_exception_handler_does_not_leak_traceback():
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
-    from api.main import global_exception_handler
+    from serving.main import global_exception_handler
 
     test_app = FastAPI()
     test_app.add_exception_handler(Exception, global_exception_handler)
@@ -88,7 +88,7 @@ def test_cors_allows_all_origins_in_development():
     with patch.dict(os.environ, {"ENVIRONMENT": "development"}):
         # reimport to pick up the env var
         import importlib
-        import api.main as main_module
+        import serving.main as main_module
         importlib.reload(main_module)
 
         client   = TestClient(main_module.app)
@@ -103,7 +103,7 @@ def test_cors_restricts_origins_in_production():
         "FRONTEND_URL":  "https://myapp.com",
     }):
         import importlib
-        import api.main as main_module
+        import serving.main as main_module
         importlib.reload(main_module)
 
         client   = TestClient(main_module.app)
@@ -124,7 +124,7 @@ def test_cors_restricts_origins_in_production():
 def test_docs_available_in_development():
     with patch.dict(os.environ, {"ENVIRONMENT": "development"}):
         import importlib
-        import api.main as main_module
+        import serving.main as main_module
         importlib.reload(main_module)
 
         client   = TestClient(main_module.app)
@@ -135,7 +135,7 @@ def test_docs_available_in_development():
 def test_docs_hidden_in_production():
     with patch.dict(os.environ, {"ENVIRONMENT": "production", "FRONTEND_URL": "https://myapp.com"}):
         import importlib
-        import api.main as main_module
+        import serving.main as main_module
         importlib.reload(main_module)
 
         client   = TestClient(main_module.app)

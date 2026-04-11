@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from unittest.mock      import patch
 from fastapi.testclient import TestClient
-from api.main           import app
+from serving.main       import app
 
 client = TestClient(app)
 
@@ -26,7 +26,7 @@ MOCK_CONNECT_OK = {
 
 # POST /api/connect — success cases.
 
-@patch("api.routes.connection.connect")
+@patch("serving.routes.connection.connect")
 def test_connect_postgresql_success(mock_connect):
     mock_connect.return_value = MOCK_CONNECT_OK
 
@@ -45,7 +45,7 @@ def test_connect_postgresql_success(mock_connect):
     assert data["error"]             is None
 
 
-@patch("api.routes.connection.connect")
+@patch("serving.routes.connection.connect")
 def test_connect_mysql_success(mock_connect):
     mock_connect.return_value = {**MOCK_CONNECT_OK, "db_type": "mysql"}
 
@@ -59,7 +59,7 @@ def test_connect_mysql_success(mock_connect):
     assert data["db_type"] == "mysql"
 
 
-@patch("api.routes.connection.connect")
+@patch("serving.routes.connection.connect")
 def test_connect_sqlite_success(mock_connect):
     mock_connect.return_value = {**MOCK_CONNECT_OK, "db_type": "sqlite"}
 
@@ -107,7 +107,7 @@ def test_connect_sqlite_missing_sqlite_path():
     assert "sqlite_path" in data["error"]
 
 
-@patch("api.routes.connection.connect")
+@patch("serving.routes.connection.connect")
 def test_connect_db_error_propagated(mock_connect):
     mock_connect.return_value = {"status": "error", "error": "could not connect to server"}
 
@@ -122,7 +122,7 @@ def test_connect_db_error_propagated(mock_connect):
     assert "could not connect" in data["error"]
 
 
-@patch("api.routes.connection.connect")
+@patch("serving.routes.connection.connect")
 def test_connect_session_id_is_unique_per_request(mock_connect):
     mock_connect.return_value = MOCK_CONNECT_OK
 
@@ -140,7 +140,7 @@ def test_connect_session_id_is_unique_per_request(mock_connect):
 
 # DELETE /api/disconnect.
 
-@patch("api.routes.connection.disconnect")
+@patch("serving.routes.connection.disconnect")
 def test_disconnect_success(mock_disconnect):
     mock_disconnect.return_value = {"status": "ok", "error": None}
 
@@ -151,7 +151,7 @@ def test_disconnect_success(mock_disconnect):
     assert response.json()["error"]   is None
 
 
-@patch("api.routes.connection.disconnect")
+@patch("serving.routes.connection.disconnect")
 def test_disconnect_session_not_found(mock_disconnect):
     mock_disconnect.return_value = {"status": "error", "error": "Session not found."}
 

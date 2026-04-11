@@ -7,7 +7,7 @@ handles database connection and disconnection.
 
 import uuid
 from fastapi import APIRouter
-from api.schemas.models import ConnectRequest, ConnectResponse, DisconnectResponse
+from serving.schemas.models import ConnectRequest, ConnectResponse, DisconnectResponse
 from querymate.core.connection import connect, disconnect
 from querymate.core.logger import get_logger
 
@@ -65,7 +65,7 @@ def connect_to_database(request: ConnectRequest):
 
     session_id = str(uuid.uuid4())
 
-    logger.info("api | connect | db_type: %s | session: %s", db_type, session_id)
+    logger.info("serving | connect | db_type: %s | session: %s", db_type, session_id)
 
     result = connect(
         session_id = session_id,
@@ -99,7 +99,7 @@ def disconnect_from_database(session_id:str):
     tears down the DB connection and wipes all session data.
     """
 
-    logger.info("api | disconnect | session: %s", session_id)
+    logger.info("serving | disconnect | session: %s", session_id)
 
     result = disconnect(session_id)
 

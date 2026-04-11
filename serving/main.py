@@ -3,7 +3,7 @@ fastapi application entry point.
 registers all routers, middleware, and global exception handling.
 
 run with:
-    uvicorn api.main:app --reload --port 8000
+    uvicorn serving.main:app --reload --port 8000
 """
 
 import time
@@ -11,8 +11,8 @@ import traceback
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from api.routes import connection, query, schema
-from api.schemas.models import HealthResponse
+from serving.routes import connection, query, schema
+from serving.schemas.models import HealthResponse
 from querymate.core.logger import get_logger
 
 
@@ -37,18 +37,22 @@ app.add_middleware(
 )
 
 
-# request logging middleware, this logs method, path, status, and response time.
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    start = time.perf_counter()
-    response = await call_next(request)
-    duration = (time.perf_counter() - start) * 1000
+    """
+    middleware for logging all incoming requests abd their durations.
+    """
 
-    logger.info(
-        "api | %s %s --> %d | %.1fms", request.method, request.url.path, response.status_code, duration,
-         )
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    end_time = time.perf_counter() 
+
+    duration = (end_time - start_time) * 1000
+
+    logger.info("serving | %s %s --> %d | %.1fms", request.method, request.url.path, response.status_code, duration)
     
     return response
+
 
 
 @app.exception_handler(Exception)
@@ -57,16 +61,14 @@ async def global_exception_handler(request: Request, exc: Exception):
     global exception handler for preventing internal details leaking in 500 responses.
     """
 
-    logger.error(
-        "api | unhandled exception | %s %s | %s", request.method, request.url.path, traceback.format_exc(),
-         )
+    logger.error("serving | unhandled exception | %s %s | %s", request.method, request.url.path, traceback.format_exc())
     
     return JSONResponse(
         status_code = 500,
         content = {
             "status": "error",
-            "error":  "An unexpected error occurred. Please try again or contact support.",
-        },
+            "error": "An unexpected error occurred. Please try again or contact support.",
+        }
     )
 
 

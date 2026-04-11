@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from unittest.mock      import patch
 from fastapi.testclient import TestClient
-from api.main           import app
+from serving.main           import app
 
 client = TestClient(app)
 
@@ -56,8 +56,8 @@ MOCK_PIPELINE_VALIDATION_FAILED = {
 
 # POST /api/query — success cases.
 
-@patch("api.routes.query.get_session")
-@patch("api.routes.query.run_pipeline")
+@patch("serving.routes.query.get_session")
+@patch("serving.routes.query.run_pipeline")
 def test_query_success(mock_pipeline, mock_session):
     mock_session.return_value  = MOCK_SESSION
     mock_pipeline.return_value = MOCK_PIPELINE_OK
@@ -78,8 +78,8 @@ def test_query_success(mock_pipeline, mock_session):
     assert data["error"]     is None
 
 
-@patch("api.routes.query.get_session")
-@patch("api.routes.query.run_pipeline")
+@patch("serving.routes.query.get_session")
+@patch("serving.routes.query.run_pipeline")
 def test_query_cannot_answer(mock_pipeline, mock_session):
     mock_session.return_value  = MOCK_SESSION
     mock_pipeline.return_value = MOCK_PIPELINE_CANNOT_ANSWER
@@ -95,8 +95,8 @@ def test_query_cannot_answer(mock_pipeline, mock_session):
     assert data["rows"]   is None
 
 
-@patch("api.routes.query.get_session")
-@patch("api.routes.query.run_pipeline")
+@patch("serving.routes.query.get_session")
+@patch("serving.routes.query.run_pipeline")
 def test_query_validation_failed(mock_pipeline, mock_session):
     mock_session.return_value  = MOCK_SESSION
     mock_pipeline.return_value = MOCK_PIPELINE_VALIDATION_FAILED
@@ -111,8 +111,8 @@ def test_query_validation_failed(mock_pipeline, mock_session):
     assert data["attempts"] == 3
 
 
-@patch("api.routes.query.get_session")
-@patch("api.routes.query.run_pipeline")
+@patch("serving.routes.query.get_session")
+@patch("serving.routes.query.run_pipeline")
 def test_query_passes_correct_schema_and_db_type_to_pipeline(mock_pipeline, mock_session):
     mock_session.return_value  = MOCK_SESSION
     mock_pipeline.return_value = MOCK_PIPELINE_OK
@@ -130,7 +130,7 @@ def test_query_passes_correct_schema_and_db_type_to_pipeline(mock_pipeline, mock
 
 # POST /api/query — error cases.
 
-@patch("api.routes.query.get_session")
+@patch("serving.routes.query.get_session")
 def test_query_session_not_found(mock_session):
     mock_session.return_value = None
 

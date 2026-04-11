@@ -5,7 +5,7 @@ this helps to returns the cached schema for an active session.
 """
 
 from fastapi import APIRouter
-from api.schemas.models import SchemaResponse
+from serving.schemas.models import SchemaResponse
 from querymate.core.connection import get_session
 from querymate.core.logger import get_logger
 
@@ -24,7 +24,7 @@ def get_schema(session_id: str):
     session = get_session(session_id)
 
     if not session:
-        logger.warning("api | schema | session not found: %s", session_id)
+        logger.warning("serving | schema | session not found: %s", session_id)
         return SchemaResponse(
             status = "error",
             db_type = None,

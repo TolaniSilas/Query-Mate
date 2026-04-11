@@ -25,7 +25,7 @@ from querymate.core.query_validator import is_safe_query
 from querymate.core.connection import execute_query
 from fastapi.testclient import TestClient
 import importlib
-import api.main as main_module
+import serving.main as main_module
 
 
 

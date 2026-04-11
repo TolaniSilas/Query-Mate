@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from unittest.mock      import patch
 from fastapi.testclient import TestClient
-from api.main           import app
+from serving.main       import app
 
 client = TestClient(app)
 
@@ -27,7 +27,7 @@ MOCK_SESSION = {
 
 
 # GET /api/schema — success cases.
-@patch("api.routes.schema.get_session")
+@patch("serving.routes.schema.get_session")
 def test_get_schema_success(mock_session):
     mock_session.return_value = MOCK_SESSION
 
@@ -42,7 +42,7 @@ def test_get_schema_success(mock_session):
     assert data["error"]   is None
 
 
-@patch("api.routes.schema.get_session")
+@patch("serving.routes.schema.get_session")
 def test_get_schema_returns_correct_tables(mock_session):
     mock_session.return_value = MOCK_SESSION
 
@@ -54,7 +54,7 @@ def test_get_schema_returns_correct_tables(mock_session):
     assert "orders" in tables
 
 
-@patch("api.routes.schema.get_session")
+@patch("serving.routes.schema.get_session")
 def test_get_schema_returns_prompt_string(mock_session):
     mock_session.return_value = MOCK_SESSION
 
@@ -64,7 +64,7 @@ def test_get_schema_returns_prompt_string(mock_session):
     assert "CREATE TABLE" in data["prompt"]
 
 
-@patch("api.routes.schema.get_session")
+@patch("serving.routes.schema.get_session")
 def test_get_schema_returns_correct_db_type(mock_session):
     mock_session.return_value = {**MOCK_SESSION, "db_type": "mysql"}
 
@@ -74,7 +74,7 @@ def test_get_schema_returns_correct_db_type(mock_session):
 
 
 # GET /api/schema — error cases.
-@patch("api.routes.schema.get_session")
+@patch("serving.routes.schema.get_session")
 def test_get_schema_session_not_found(mock_session):
     mock_session.return_value = None
 

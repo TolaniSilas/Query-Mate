@@ -22,8 +22,8 @@ print("======================")
 # print("======================")
 # print(result.rows)   
 # print("======================")
-# print(result.status)   
-# print("======================")
+print(result.status)   
+print("======================")
 
 query_mate.disconnect()  
 
