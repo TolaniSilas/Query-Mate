@@ -35,10 +35,7 @@ from querymate.memory.cache import set_session_cache, get_session_cache, delete_
 logger = get_logger(__name__)
 
 
-# in-process engine cache — keyed by session_id.
-# engines cannot be serialised, so they always live here.
 _engines: dict[str, Engine] = {}
-
 
 
 def _build_sqlite_engine(database: str) -> Engine:

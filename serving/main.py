@@ -1,9 +1,5 @@
 """
-fastapi application entry point.
-registers all routers, middleware, and global exception handling.
-
-run with:
-    uvicorn serving.main:app --reload --port 8000
+main.py - FASTAPI application for QueryMate serving.
 """
 
 import time
@@ -11,7 +7,7 @@ import traceback
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from serving.routes import connection, query, schema
+from serving.routes import query
 from serving.schemas.models import HealthResponse
 from querymate.core.logger import get_logger
 
@@ -21,13 +17,12 @@ VERSION = "1.0.0"
 
 
 app = FastAPI(
-    title = "QueryMate API",
+    title = "QueryMate Serving",
     description = "natural language interface for relational databases.",
     version = VERSION,
 )
 
 
-# cors for locked frontend domain in production.
 app.add_middleware(
     CORSMiddleware,
     allow_origins = ["*"],
@@ -39,30 +34,23 @@ app.add_middleware(
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """
-    middleware for logging all incoming requests abd their durations.
-    """
+    """log all incoming requests with method, path, status code, and duration."""
 
     start_time = time.perf_counter()
     response = await call_next(request)
-    end_time = time.perf_counter() 
+    end_time = time.perf_counter()
 
     duration = (end_time - start_time) * 1000
 
     logger.info("serving | %s %s --> %d | %.1fms", request.method, request.url.path, response.status_code, duration)
-    
-    return response
 
+    return response
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    """
-    global exception handler for preventing internal details leaking in 500 responses.
-    """
-
     logger.error("serving | unhandled exception | %s %s | %s", request.method, request.url.path, traceback.format_exc())
-    
+
     return JSONResponse(
         status_code = 500,
         content = {
@@ -72,13 +60,18 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-# routers.
-app.include_router(connection.router, prefix="/api", tags=["connection"])
-app.include_router(query.router, prefix="/api", tags=["query"])
-app.include_router(schema.router, prefix="/api", tags=["schema"])
+app.include_router(query.router, prefix="/serving", tags=["query"])
 
 
-# health check.
 @app.get("/health", response_model=HealthResponse, tags=["health"])
 def health_check():
     return HealthResponse(status="ok", version=VERSION)
+
+
+
+
+
+
+
+
+# run with: uvicorn serving.main:app --reload --port 8000

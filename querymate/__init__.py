@@ -120,8 +120,10 @@ class QueryMate:
             ensure_user(self._user_id)
             close_active_session(self._user_id)
             create_session(self._user_id, self._session_id)
+            
         except ConnectionError:
             raise
+
         except Exception as e:
             raise ConnectionError(
                 f"QueryMate failed to initialise the memory store or session cache.\n"
