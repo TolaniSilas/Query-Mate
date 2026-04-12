@@ -37,7 +37,7 @@ def is_safe_query(sql: str) -> tuple[bool, str | None]:
     """
     validates that a SQL string is safe to execute (read-only SELECT only).
 
-    parameters
+    params
         sql: the SQL string to validate
 
     returns
