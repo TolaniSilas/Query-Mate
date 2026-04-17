@@ -1,4 +1,7 @@
+ 'use client'
+
 import { ArrowRight } from 'lucide-react'
+import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
 
 const STEPS = [
   { n: '01', label: 'User Question',      desc: 'Plain English submitted through the interface or SDK',                        dark: false },
@@ -25,23 +28,25 @@ const LAYERS = [
 ]
 
 export default function Architecture() {
+  const rootRef = useScrollReveal<HTMLDivElement>()
+
   return (
     <section id="architecture" style={{ padding: '112px 0', backgroundColor: '#F4F1EB' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+      <div ref={rootRef} style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
 
         {/* section header */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '32px 64px', marginBottom: 64 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div data-scroll-reveal className="scroll-reveal delay-100" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{ height: 1, width: 32, backgroundColor: '#B8924A' }} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#B8924A', textTransform: 'uppercase', letterSpacing: '0.15em' }}>System Design & Architecture</span>
             </div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#0D0D0D', letterSpacing: '-0.02em' }}>
+            <h2 data-scroll-reveal className="scroll-reveal delay-200" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#0D0D0D', letterSpacing: '-0.02em' }}>
               How it
               <br /><em>actually works.</em>
             </h2>
           </div>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.75, display: 'flex', alignItems: 'flex-end' }}>
+          <p data-scroll-reveal className="scroll-reveal delay-300" style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.75, display: 'flex', alignItems: 'flex-end' }}>
             A multi-agent pipeline where each stage has a single responsibility.
             The system is designed so that every layer can fail independently
             without exposing your database to risk.
@@ -49,12 +54,12 @@ export default function Architecture() {
         </div>
 
         {/* pipeline label */}
-        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#7A7670', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
+        <p data-scroll-reveal className="scroll-reveal delay-400" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#7A7670', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
           Pipeline Flow
         </p>
 
         {/* pipeline steps — horizontal scroll on small screens */}
-        <div style={{ display: 'flex', alignItems: 'stretch', gap: 2, marginBottom: 48, overflowX: 'auto', paddingBottom: 4 }}>
+        <div data-scroll-reveal className="scroll-reveal delay-500" style={{ display: 'flex', alignItems: 'stretch', gap: 2, marginBottom: 48, overflowX: 'auto', paddingBottom: 4 }}>
           {STEPS.map(({ n, label, desc, dark }, i) => (
             <div key={n} style={{ display: 'flex', alignItems: 'center', flexShrink: 0, flex: '1 1 150px', minWidth: 130 }}>
               <div
@@ -80,7 +85,7 @@ export default function Architecture() {
         </div>
 
         {/* security layers table */}
-        <div style={{ border: '1px solid #E8E3D8', borderRadius: 3, overflow: 'hidden', marginBottom: 32 }}>
+        <div data-scroll-reveal className="scroll-reveal delay-600" style={{ border: '1px solid #E8E3D8', borderRadius: 3, overflow: 'hidden', marginBottom: 32 }}>
           <div style={{ padding: '14px 24px', borderBottom: '1px solid #E8E3D8', backgroundColor: '#EFECEA' }}>
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#7A7670', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
               Read-Only Security Layers
@@ -113,7 +118,7 @@ export default function Architecture() {
         </div>
 
         {/* pull quote */}
-        <div style={{ backgroundColor: '#0D0D0D', borderRadius: 3, padding: '28px 32px', display: 'flex', gap: 20 }}>
+        <div data-scroll-reveal className="scroll-reveal delay-700" style={{ backgroundColor: '#0D0D0D', borderRadius: 3, padding: '28px 32px', display: 'flex', gap: 20 }}>
           <div style={{ width: 3, flexShrink: 0, backgroundColor: '#B8924A', borderRadius: 2 }} />
           <div>
             <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontStyle: 'italic', color: '#F4F1EB', marginBottom: 8 }}>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '@/src/components/layout/Header'
 import Footer from '@/src/components/layout/Footer'
 import Hero from '@/src/components/sections/Hero'
@@ -9,33 +9,33 @@ import Services from '@/src/components/sections/Services'
 import Architecture from '@/src/components/sections/Architecture'
 import Security from '@/src/components/sections/Security'
 import ChatButton from '@/src/components/chat/ChatButton'
-// import ChatPanel from '@/src/components/chat/ChatPanel'
+import Package from '@/src/components/sections/Package'
 
 export default function Home() {
-  const [chatOpen, setChatOpen] = useState(false)
+  const router = useRouter()
+  const goToChat = () => router.push('/signup')
 
   return (
     <>
-      <Header />
+      <Header onTryChat={goToChat} />
 
       <main>
         <Hero />
-        <About />
-        <Services />
-        <Architecture />
-        <Security />
+        <div style={{ position: 'relative', zIndex: 10, backgroundColor: 'var(--paper)' }}>
+          <About />
+          <Package />
+          <Services />
+          <Architecture />
+          <Security />
+        </div>
       </main>
 
       <Footer />
 
       <ChatButton
-        isOpen={chatOpen}
-        onClick={() => setChatOpen(prev => !prev)}
+        isOpen={false}
+        onClick={goToChat}
       />
-      {/* <ChatPanel
-        isOpen={chatOpen}
-        onClose={() => setChatOpen(false)}
-      /> */}
     </>
   )
 }

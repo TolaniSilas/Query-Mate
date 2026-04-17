@@ -1,4 +1,7 @@
+ 'use client'
+
 import { Lock, Search, ShieldCheck, KeyRound, CheckCircle2, Minus, AlertTriangle } from 'lucide-react'
+import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
 
 const FEATURES = [
   {
@@ -39,23 +42,25 @@ function Cell({ value }: { value: boolean | string }) {
 }
 
 export default function Security() {
+  const rootRef = useScrollReveal<HTMLDivElement>()
+
   return (
     <section id="security" style={{ padding: '112px 0', backgroundColor: '#EFECEA' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+      <div ref={rootRef} style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
 
         {/* header */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '32px 64px', marginBottom: 64 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div data-scroll-reveal className="scroll-reveal delay-100" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{ height: 1, width: 32, backgroundColor: '#B8924A' }} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#B8924A', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Security</span>
             </div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#0D0D0D', letterSpacing: '-0.02em' }}>
+            <h2 data-scroll-reveal className="scroll-reveal delay-200" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#0D0D0D', letterSpacing: '-0.02em' }}>
               Security is not
               <br /><em>optional here.</em>
             </h2>
           </div>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.75, display: 'flex', alignItems: 'flex-end' }}>
+          <p data-scroll-reveal className="scroll-reveal delay-300" style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.75, display: 'flex', alignItems: 'flex-end' }}>
             Most Text-to-SQL tools delegate security entirely to the developer.
             QueryMate enforces it at every layer — automatically — so your database
             is protected by default, not by convention.
@@ -64,9 +69,11 @@ export default function Security() {
 
         {/* feature cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, marginBottom: 48 }}>
-          {FEATURES.map(({ Icon, title, desc }) => (
+          {FEATURES.map(({ Icon, title, desc }, idx) => (
             <div
               key={title}
+              data-scroll-reveal
+              className={`scroll-reveal delay-${Math.min(700, (idx + 1) * 100)}`}
               style={{ backgroundColor: '#F4F1EB', border: '1px solid #E8E3D8', borderRadius: 3, padding: '28px 24px', transition: 'border-color 0.2s' }}
               onMouseEnter={e => (e.currentTarget.style.borderColor = '#B8924A')}
               onMouseLeave={e => (e.currentTarget.style.borderColor = '#E8E3D8')}
@@ -85,7 +92,7 @@ export default function Security() {
         </div>
 
         {/* comparison table */}
-        <div style={{ backgroundColor: '#F4F1EB', border: '1px solid #E8E3D8', borderRadius: 3, overflow: 'hidden' }}>
+        <div data-scroll-reveal className="scroll-reveal delay-700" style={{ backgroundColor: '#F4F1EB', border: '1px solid #E8E3D8', borderRadius: 3, overflow: 'hidden' }}>
           <div style={{ padding: '14px 24px', borderBottom: '1px solid #E8E3D8', backgroundColor: '#EFECEA', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#7A7670', textTransform: 'uppercase', letterSpacing: '0.12em' }}>QueryMate vs LangChain SQL Toolkit</p>
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#B8B3AA' }}>Security comparison</p>

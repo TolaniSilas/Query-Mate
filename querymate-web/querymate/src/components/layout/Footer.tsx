@@ -1,3 +1,5 @@
+ 'use client'
+
 import { Database, Package, BookOpen, ArrowUpRight } from 'lucide-react'
 
 const COLS = [
@@ -14,7 +16,7 @@ const COLS = [
     heading: 'Developers',
     links: [
       { label: 'Documentation', href: '#', ext: true },
-      { label: 'PyPI Package',  href: '#', ext: true },
+      { label: 'PyPI Package',  href: '#package', ext: false },
       // { label: 'GitHub',        href: '#', ext: true },
       { label: 'Changelog',     href: '#', ext: true },
     ],

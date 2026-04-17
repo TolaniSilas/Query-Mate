@@ -1,4 +1,7 @@
+ 'use client'
+
 import { Users, BarChart3, FileSearch, MessageSquare } from 'lucide-react'
+import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
 
 const USE_CASES = [
   { Icon: Users,       title: 'Non-Technical Stakeholders', desc: 'Executives and analysts query databases directly in plain English — no SQL knowledge required at any level.' },
@@ -8,30 +11,32 @@ const USE_CASES = [
 ]
 
 export default function About() {
+  const rootRef = useScrollReveal<HTMLDivElement>()
+
   return (
     <section id="about" style={{ padding: '112px 0', backgroundColor: '#F4F1EB' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+      <div ref={rootRef} style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
 
         {/* header grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '48px 64px', marginBottom: 72 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div data-scroll-reveal className="scroll-reveal delay-100" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{ height: 1, width: 32, backgroundColor: '#B8924A' }} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#B8924A', textTransform: 'uppercase', letterSpacing: '0.15em' }}>About the Project</span>
             </div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#0D0D0D', letterSpacing: '-0.02em' }}>
+            <h2 data-scroll-reveal className="scroll-reveal delay-200" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#0D0D0D', letterSpacing: '-0.02em' }}>
               Databases speak SQL.
               <br /><em style={{ fontStyle: 'italic' }}>You don&apos;t have to.</em>
             </h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.75, marginBottom: 16 }}>
+            <p data-scroll-reveal className="scroll-reveal delay-300" style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.75, marginBottom: 16 }}>
               QueryMate is a natural language Python package and interface for relational databases.
               It currently supports MySQL, PostgreSQL, and SQLite, and enforces security at both
               the connection level and query level — ensuring only safe, read-only operations
               reach your database.
             </p>
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.75 }}>
+            <p data-scroll-reveal className="scroll-reveal delay-400" style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.75 }}>
               Built around a multi-agent pipeline, it translates natural language questions into
               validated SQL, executes them safely, and returns precise human-readable answers.
             </p>
@@ -43,8 +48,8 @@ export default function About() {
 
         {/* use cases */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '40px 32px', marginBottom: 64 }}>
-          {USE_CASES.map(({ Icon, title, desc }) => (
-            <div key={title}>
+          {USE_CASES.map(({ Icon, title, desc }, idx) => (
+            <div key={title} data-scroll-reveal className={`scroll-reveal delay-${Math.min(700, (idx + 1) * 100)}`}>
               <div style={{ width: 40, height: 40, border: '1px solid #E8E3D8', borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                 <Icon size={16} color="#7A7670" strokeWidth={1.5} />
               </div>
@@ -55,7 +60,7 @@ export default function About() {
         </div>
 
         {/* database strip */}
-        <div style={{ paddingTop: 32, borderTop: '1px solid #E8E3D8', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px 24px' }}>
+        <div data-scroll-reveal className="scroll-reveal delay-700" style={{ paddingTop: 32, borderTop: '1px solid #E8E3D8', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px 24px' }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#7A7670', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Supported databases</span>
           <div style={{ width: 1, height: 16, backgroundColor: '#E8E3D8' }} />
           {['PostgreSQL', 'MySQL', 'SQLite'].map(db => (

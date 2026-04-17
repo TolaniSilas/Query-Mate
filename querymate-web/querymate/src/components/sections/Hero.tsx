@@ -1,26 +1,30 @@
 'use client'
 
-import { ArrowDown, Terminal, Shield, Zap, Database } from 'lucide-react'
-
-const PILLS = [
-  { Icon: Terminal, label: 'Multi-Agent Pipeline' },
-  { Icon: Shield,   label: 'Read-Only Enforced'   },
-  { Icon: Database, label: 'PostgreSQL · MySQL · SQLite' },
-  { Icon: Zap,      label: '4 LLM Providers'       },
-]
+import Link from 'next/link'
+import { ArrowDown, Terminal, Shield, Zap, Database, MousePointer2, ArrowRight } from 'lucide-react'
 
 export default function Hero() {
   return (
     <section
-      style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 64, position: 'relative', overflow: 'hidden' }}
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        paddingTop: 80,
+        position: 'sticky',
+        top: 0,
+        zIndex: 0,
+        overflow: 'hidden'
+      }}
     >
       {/* fine dot grid background */}
       <div
         aria-hidden
         style={{
-          position:    'absolute', inset: 0, pointerEvents: 'none',
+          position: 'absolute', inset: 0, pointerEvents: 'none',
           backgroundImage: 'radial-gradient(circle, #0D0D0D18 1px, transparent 1px)',
-          backgroundSize:  '28px 28px',
+          backgroundSize: '28px 28px',
         }}
       />
 
@@ -28,7 +32,7 @@ export default function Hero() {
       <div
         aria-hidden
         style={{
-          position:  'absolute', top: '50%', left: '50%',
+          position: 'absolute', top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
           fontFamily: 'var(--font-display)', fontSize: 'clamp(80px, 18vw, 240px)',
           fontWeight: 400, color: 'rgba(13,13,13,0.028)',
@@ -40,121 +44,120 @@ export default function Hero() {
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px', position: 'relative', zIndex: 1, width: '100%' }}>
-
-        {/* eyebrow */}
-        <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <div style={{ height: 1, width: 32, backgroundColor: '#B8924A' }} />
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#B8924A', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            Text-to-SQL · Multi-Agent · Secure
-          </span>
-        </div>
-
-        {/* headline */}
-        <h1
-          className="reveal-up delay-100"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize:   'clamp(52px, 9vw, 108px)',
-            fontWeight: 400,
-            lineHeight: 0.95,
-            color:      '#0D0D0D',
-            letterSpacing: '-0.02em',
-            marginBottom: 32,
-          }}
-        >
-          Ask your database
-          <br />
-          <em style={{ fontStyle: 'italic', color: '#B8924A' }}>anything.</em>
-        </h1>
-
-        {/* subheading */}
-        <p
-          className="reveal-up delay-200"
-          style={{
-            fontFamily: 'var(--font-sans)', fontSize: 18, color: '#7A7670',
-            maxWidth: 520, lineHeight: 1.7, marginBottom: 40,
-          }}
-        >
-          QueryMate translates plain English questions into precise SQL queries
-          and returns human-readable answers — powered by a multi-agent pipeline
-          with layered read-only security enforcement.
-        </p>
-
-        {/* code block */}
-        <div className="reveal-up delay-300" style={{ display: 'inline-block', marginBottom: 40 }}>
-          <div style={{ backgroundColor: '#0D0D0D', borderRadius: 4, overflow: 'hidden', border: '1px solid #2a2a2a' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderBottom: '1px solid #1e1e1e' }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#2a2a2a' }} />
-              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#2a2a2a' }} />
-              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#2a2a2a' }} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'rgba(244,241,235,0.25)', marginLeft: 6 }}>python</span>
+        <div className="hero-grid">
+          {/* left column: headline and info */}
+          <div className="reveal-up">
+            {/* eyebrow */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
+              <div style={{ height: 1, width: 32, backgroundColor: '#B8924A' }} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#B8924A', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+                Text-to-SQL · Multi-Agent · Secure
+              </span>
             </div>
-            <pre style={{ padding: '16px 20px', fontFamily: 'var(--font-mono)', fontSize: 13, lineHeight: 1.8, overflowX: 'auto' }}>
-              <span style={{ color: 'rgba(244,241,235,0.4)' }}>from </span>
-              <span style={{ color: '#B8924A' }}>querymate </span>
-              <span style={{ color: 'rgba(244,241,235,0.4)' }}>import </span>
-              <span style={{ color: '#F4F1EB' }}>QueryMate{'\n'}</span>
-              <span style={{ color: 'rgba(244,241,235,0.4)' }}>{'\n'}</span>
-              <span style={{ color: '#F4F1EB' }}>qm </span>
-              <span style={{ color: 'rgba(244,241,235,0.4)' }}>= </span>
-              <span style={{ color: '#F4F1EB' }}>QueryMate(db_type</span>
-              <span style={{ color: 'rgba(244,241,235,0.4)' }}>=</span>
-              <span style={{ color: '#B8924A' }}>&quot;postgresql&quot;</span>
-              <span style={{ color: '#F4F1EB' }}>, database_url</span>
-              <span style={{ color: 'rgba(244,241,235,0.4)' }}>=</span>
-              <span style={{ color: '#B8924A' }}>url</span>
-              <span style={{ color: '#F4F1EB' }}>){'\n'}</span>
-              <span style={{ color: '#F4F1EB' }}>result </span>
-              <span style={{ color: 'rgba(244,241,235,0.4)' }}>= </span>
-              <span style={{ color: '#F4F1EB' }}>qm.ask(</span>
-              <span style={{ color: '#B8924A' }}>&quot;Which merchant had the highest revenue?&quot;</span>
-              <span style={{ color: '#F4F1EB' }}>){'\n'}</span>
-              <span style={{ color: 'rgba(244,241,235,0.5)' }}>print</span>
-              <span style={{ color: '#F4F1EB' }}>(result.answer)</span>
-            </pre>
-          </div>
-        </div>
 
-        {/* pills */}
-        <div className="reveal-up delay-400" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 48 }}>
-          {PILLS.map(({ Icon, label }) => (
-            <div
-              key={label}
+            {/* headline */}
+            <h1
+              className="reveal-up delay-100"
               style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '7px 14px', border: '1px solid #E8E3D8',
-                borderRadius: 100, backgroundColor: 'rgba(244,241,235,0.7)',
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(48px, 6vw, 84px)',
+                fontWeight: 400,
+                lineHeight: 0.95,
+                color: '#0D0D0D',
+                letterSpacing: '-0.02em',
+                marginBottom: 24,
               }}
             >
-              <Icon size={12} color="#B8924A" strokeWidth={1.5} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#7A7670' }}>{label}</span>
-            </div>
-          ))}
-        </div>
+              Ask your database
+              <br />
+              <em style={{ fontStyle: 'italic', color: '#B8924A' }}>anything.</em>
+            </h1>
 
-        {/* cta buttons */}
-        <div className="reveal-up delay-500" style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-          <a
-            href="https://pypi.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', backgroundColor: '#0D0D0D', color: '#F4F1EB', fontFamily: 'var(--font-sans)', fontSize: 14, fontWeight: 500, borderRadius: 3, textDecoration: 'none', transition: 'background 0.2s' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#2a2a2a')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#0D0D0D')}
-          >
-            Get Started
-            <ArrowDown size={14} style={{ transform: 'rotate(-90deg)' }} />
-          </a>
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', border: '1px solid #E8E3D8', color: '#0D0D0D', fontFamily: 'var(--font-sans)', fontSize: 14, fontWeight: 500, borderRadius: 3, textDecoration: 'none', transition: 'background 0.2s' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E8E3D8')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            View on GitHub
-          </a>
+            {/* subheading */}
+            <p
+              className="reveal-up delay-200"
+              style={{
+                fontFamily: 'var(--font-sans)', fontSize: 17, color: '#7A7670',
+                maxWidth: 480, lineHeight: 1.6, marginBottom: 32,
+              }}
+            >
+              QueryMate translates plain English questions into precise SQL queries
+              and returns human-readable answers — powered by a multi-agent pipeline
+              with layered read-only security enforcement.
+            </p>
+
+            <div className="reveal-up delay-600" style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 40 }}>
+              <Link
+                href="/signup"
+                className="font-space"
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, backgroundColor: '#0D0D0D', color: '#F4F1EB', padding: '12px 32px', borderRadius: 4, border: 'none', cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', textDecoration: 'none' }}
+              >
+                Sign Up Now
+              </Link>
+              <button
+                className="font-space"
+                style={{ fontSize: 14, fontWeight: 600, backgroundColor: 'transparent', color: '#0D0D0D', padding: '12px 32px', borderRadius: 4, border: '1px solid #E8E3D8', cursor: 'pointer' }}
+              >
+                Learn More
+              </button>
+            </div>
+
+            {/* pills */}
+            <div className="reveal-up delay-400" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 40 }}>
+              {[
+                { Icon: Terminal, label: 'Multi-Agent' },
+                { Icon: Shield, label: 'Read-Only' },
+                { Icon: Database, label: 'SQL' },
+              ].map(({ Icon, label }) => (
+                <div
+                  key={label}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '6px 12px', border: '1px solid #E8E3D8',
+                    borderRadius: 100, backgroundColor: 'rgba(244,241,235,0.7)',
+                  }}
+                >
+                  <Icon size={12} color="#B8924A" strokeWidth={1.5} />
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#7A7670' }}>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* right column: product preview */}
+          <div className="reveal-up" style={{ display: 'flex', justifyContent: 'flex-start', perspective: '1000px', position: 'relative', minHeight: '600px' }}>
+            <div
+              className="reveal-up delay-600"
+              style={{
+                position: 'absolute',
+                top: '0px',
+                left: '40px',
+                transform: 'perspective(1500px) rotateY(-12deg) rotateX(4deg) scale(1.3)',
+                width: 'max(600px, 50vw)',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                transition: 'all 0.8s cubic-bezier(0.23, 1, 0.32, 1)',
+                boxShadow: '0 80px 150px rgba(0,0,0,0.3), 0 0 100px rgba(184, 146, 74, 0.1)',
+                border: '1px solid rgba(184, 146, 74, 0.3)',
+                zIndex: 2,
+                transformOrigin: 'left top',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'perspective(1500px) rotateY(-4deg) rotateX(2deg) scale(1.35)';
+                e.currentTarget.style.boxShadow = '0 100px 200px rgba(0,0,0,0.4), 0 0 180px rgba(184, 146, 74, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'perspective(1500px) rotateY(-12deg) rotateX(4deg) scale(1.3)';
+                e.currentTarget.style.boxShadow = '0 80px 150px rgba(0,0,0,0.3), 0 0 100px rgba(184, 146, 74, 0.1)';
+              }}
+            >
+              <img
+                src="/images/hero_chat_preview_image.png"
+                alt="QueryMate Dashboard Preview"
+                style={{ width: '100%', height: 'auto', display: 'block' }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 

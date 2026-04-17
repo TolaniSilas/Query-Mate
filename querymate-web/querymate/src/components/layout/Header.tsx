@@ -1,17 +1,20 @@
 'use client'
-import {useState, useEffect} from 'react'
-import {Database, Menu, X} from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Database, Menu, X } from 'lucide-react'
 
 const NAV = [
-  {label: 'About', href: '#about'},
-  {label: 'Services', href: '#services'},
-  {label: 'Architecture', href: '#architecture'},
-  {label: 'Security', href: '#security'},
+  { label: 'About', href: '#about' },
+  { label: 'Services', href: '#services' },
+  { label: 'Package', href: '#package' },
+  { label: 'Architecture', href: '#architecture' },
+  { label: 'Security', href: '#security' },
 ]
 
-export default function Header() {
+export default function Header({ onTryChat }: { onTryChat?: () => void }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 32)
@@ -20,6 +23,7 @@ export default function Header() {
   }, [])
 
   const go = (href: string) => {
+    if (href === '#') return
     setMenuOpen(false)
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -27,15 +31,15 @@ export default function Header() {
   return (
     <header
       style={{
-        position:         'fixed',
+        position: 'fixed',
         top: 0,
-        left:             0,
-        right:            0,
-        zIndex:           50,
-        backgroundColor:  scrolled ? 'rgba(244,241,235,0.97)' : 'transparent',
-        borderBottom:     scrolled ? '1px solid #E8E3D8' : '1px solid transparent',
-        backdropFilter:   scrolled ? 'blur(12px)' : 'none',
-        transition:       'all 0.3s ease',
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        backgroundColor: scrolled ? 'rgba(244,241,235,0.97)' : 'transparent',
+        borderBottom: scrolled ? '1px solid #E8E3D8' : '1px solid transparent',
+        backdropFilter: scrolled ? 'blur(12px)' : 'none',
+        transition: 'all 0.3s ease',
       }}
     >
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -55,12 +59,13 @@ export default function Header() {
         </a>
 
         {/* desktop nav */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 36 }} className="hidden-mobile">
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden-mobile">
           {NAV.map(n => (
             <button
-              key={n.href}
+              key={n.label}
               onClick={() => go(n.href)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: 14, color: '#7A7670', letterSpacing: '0.01em', transition: 'color 0.2s' }}
+              className="font-space"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, color: '#7A7670', letterSpacing: '0.01em', transition: 'color 0.2s' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#0D0D0D')}
               onMouseLeave={e => (e.currentTarget.style.color = '#7A7670')}
             >
@@ -70,27 +75,56 @@ export default function Header() {
         </nav>
 
         {/* desktop cta */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }} className="hidden-mobile">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }} className="hidden-mobile">
           <a
-            href="https://github.com"
+            href="https://github.com/TolaniSilas/Query-Mate/"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: '#7A7670', textDecoration: 'none', transition: 'color 0.2s' }}
+            className="font-space"
+            style={{ fontSize: 14, fontWeight: 500, color: '#7A7670', textDecoration: 'none', transition: 'color 0.2s' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#0D0D0D')}
             onMouseLeave={e => (e.currentTarget.style.color = '#7A7670')}
           >
             GitHub
           </a>
-          <a
-            href="https://pypi.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontFamily: 'var(--font-mono)', fontSize: 12, backgroundColor: '#0D0D0D', color: '#F4F1EB', padding: '8px 16px', borderRadius: 3, textDecoration: 'none', transition: 'background 0.2s' }}
+          <button
+            className="font-space"
+            style={{
+              fontSize: 13,
+              fontWeight: 500,
+              backgroundColor: 'transparent',
+              border: '1px solid #B8924A',
+              color: '#B8924A',
+              padding: '6px 14px',
+              borderRadius: 3,
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(184, 146, 74, 0.05)' }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent' }}
+            onClick={onTryChat}
+          >
+            Try Chat
+          </button>
+          {/* <button
+            className="font-space"
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              backgroundColor: '#0D0D0D',
+              color: '#F4F1EB',
+              padding: '6px 18px',
+              borderRadius: 3,
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }}
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#2a2a2a')}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#0D0D0D')}
           >
-            pip install
-          </a>
+            Sign in
+          </button> */}
         </div>
 
         {/* mobile hamburger */}
@@ -105,27 +139,33 @@ export default function Header() {
       </div>
 
       {/* mobile menu */}
-      {menuOpen && (
-        <div style={{ backgroundColor: '#F4F1EB', borderTop: '1px solid #E8E3D8', padding: '16px 32px 24px' }}>
-          {NAV.map(n => (
+      {
+        menuOpen && (
+          <div style={{ backgroundColor: '#F4F1EB', borderTop: '1px solid #E8E3D8', padding: '16px 32px 24px' }}>
+            {NAV.map(n => (
+              <button
+                key={n.label}
+                onClick={() => go(n.href)}
+                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-space)', fontSize: 15, fontWeight: 500, color: '#7A7670', padding: '10px 0', borderBottom: '1px solid #E8E3D8' }}
+              >
+                {n.label}
+              </button>
+            ))}
             <button
-              key={n.href}
-              onClick={() => go(n.href)}
-              style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', padding: '10px 0', borderBottom: '1px solid #E8E3D8' }}
+              style={{ display: 'block', width: '100%', marginTop: 12, fontFamily: 'var(--font-space)', fontSize: 13, fontWeight: 500, backgroundColor: 'transparent', border: '1px solid #B8924A', color: '#B8924A', padding: '12px 16px', borderRadius: 3, textAlign: 'center', cursor: 'pointer' }}
+              onClick={onTryChat}
             >
-              {n.label}
+              Try Chat
             </button>
-          ))}
-          <a
-            href="https://pypi.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'block', marginTop: 16, fontFamily: 'var(--font-mono)', fontSize: 13, backgroundColor: '#0D0D0D', color: '#F4F1EB', padding: '10px 16px', borderRadius: 3, textDecoration: 'none', textAlign: 'center' }}
-          >
-            pip install querymate
-          </a>
-        </div>
-      )}
+            <button
+              style={{ display: 'block', width: '100%', marginTop: 12, fontFamily: 'var(--font-space)', fontSize: 14, fontWeight: 600, backgroundColor: '#0D0D0D', color: '#F4F1EB', padding: '12px 16px', borderRadius: 3, border: 'none', textAlign: 'center' }}
+              onClick={() => { setMenuOpen(false); router.push('/signin') }}
+            >
+              Sign in
+            </button>
+          </div>
+        )
+      }
 
       <style>{`
         @media (max-width: 768px) {
@@ -133,6 +173,6 @@ export default function Header() {
           .show-mobile   { display: block !important; }
         }
       `}</style>
-    </header>
+    </header >
   )
 }

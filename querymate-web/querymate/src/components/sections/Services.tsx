@@ -1,3 +1,6 @@
+ 'use client'
+
+import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
 import { Languages, Brain, RefreshCw, ShieldCheck, Database, Eye } from 'lucide-react'
 
 const SERVICES = [
@@ -10,23 +13,25 @@ const SERVICES = [
 ]
 
 export default function Services() {
+  const rootRef = useScrollReveal<HTMLDivElement>()
+
   return (
     <section id="services" style={{ padding: '112px 0', backgroundColor: '#0D0D0D' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+      <div ref={rootRef} style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
 
         {/* header */}
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '24px 48px', marginBottom: 64 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div data-scroll-reveal className="scroll-reveal delay-100" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{ height: 1, width: 32, backgroundColor: '#B8924A' }} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#B8924A', textTransform: 'uppercase', letterSpacing: '0.15em' }}>What it does</span>
             </div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#F4F1EB', letterSpacing: '-0.02em' }}>
+            <h2 data-scroll-reveal className="scroll-reveal delay-200" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#F4F1EB', letterSpacing: '-0.02em' }}>
               Six agents.
               <br /><em style={{ color: '#B8924A' }}>One answer.</em>
             </h2>
           </div>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'rgba(244,241,235,0.4)', maxWidth: 320, lineHeight: 1.7 }}>
+          <p data-scroll-reveal className="scroll-reveal delay-300" style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'rgba(244,241,235,0.4)', maxWidth: 320, lineHeight: 1.7 }}>
             Each service is a discrete, independently testable component in the pipeline — from your question to a precise answer.
           </p>
         </div>
@@ -40,9 +45,11 @@ export default function Services() {
             backgroundColor: 'rgba(255,255,255,0.06)',
           }}
         >
-          {SERVICES.map(({ Icon, n, title, tag, desc }) => (
+          {SERVICES.map(({ Icon, n, title, tag, desc }, idx) => (
             <div
               key={n}
+              data-scroll-reveal
+              className={`scroll-reveal delay-${Math.min(700, (idx + 1) * 100)}`}
               style={{ backgroundColor: '#0D0D0D', padding: '36px 32px', transition: 'background 0.25s' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#161616')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#0D0D0D')}
