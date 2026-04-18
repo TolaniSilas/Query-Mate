@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation'
 import { Database, Menu, X } from 'lucide-react'
 
 const NAV = [
-  { label: 'About', href: '#about' },
-  { label: 'Services', href: '#services' },
-  { label: 'Package', href: '#package' },
-  { label: 'Architecture', href: '#architecture' },
-  { label: 'Security', href: '#security' },
+  { label:'About', href: '#about' },
+  { label:'Services', href: '#services' },
+  { label:'Package', href: '#package' },
+  { label:'Architecture', href: '#architecture' },
+  { label:'Security', href: '#security' },
 ]
 
 export default function Header({ onTryChat }: { onTryChat?: () => void }) {

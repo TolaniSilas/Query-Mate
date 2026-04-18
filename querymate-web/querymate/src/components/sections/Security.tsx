@@ -1,9 +1,14 @@
  'use client'
 
-import { Lock, Search, ShieldCheck, KeyRound, CheckCircle2, Minus, AlertTriangle } from 'lucide-react'
+import { Shield, Lock, Search, ShieldCheck, KeyRound, CheckCircle2, Minus, AlertTriangle } from 'lucide-react'
 import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
 
 const FEATURES = [
+  {
+    Icon: Shield,
+    title: 'Graceful Guardrails',
+    desc: 'Before SQL generation begins, guardrails screen prompts for unsafe instructions, out-of-policy requests, and missing context so risky input is stopped early rather than corrected late. This also helps preserve token usage and regulate LLM input and output costs.',
+  },
   {
     Icon: Lock,
     title: 'Connection-Level Read-Only',
@@ -27,17 +32,18 @@ const FEATURES = [
 ]
 
 const TABLE_ROWS = [
-  { feature: 'Read-only connection enforcement',      qm: true,  lc: false },
-  { feature: 'Rule-based SQL keyword scanning',       qm: true,  lc: false },
-  { feature: 'LLM semantic validation gate',          qm: true,  lc: 'opt' },
-  { feature: 'Agentic retry loop with feedback',      qm: true,  lc: false },
-  { feature: 'Credentials never returned to client',  qm: true,  lc: false },
-  { feature: 'Comment stripping before scan',         qm: true,  lc: false },
+  { feature: 'Prompt guardrails before SQL generation', qm: true, lc: false },
+  { feature: 'Read-only connection enforcement', qm: true, lc: false },
+  { feature: 'Rule-based SQL keyword scanning', qm: true, lc: false },
+  { feature: 'LLM semantic validation gate', qm: true, lc: 'opt' },
+  { feature: 'Agentic retry loop with feedback', qm: true, lc: false },
+  { feature: 'Credentials never returned to client', qm: true, lc: false },
+  { feature: 'Comment stripping before scan', qm: true, lc: false },
 ]
 
 function Cell({ value }: { value: boolean | string }) {
-  if (value === true)    return <CheckCircle2  size={16} color="#B8924A" strokeWidth={2} />
-  if (value === 'opt')   return <AlertTriangle size={16} color="#d97706" strokeWidth={2} />
+  if (value === true) return <CheckCircle2  size={16} color="#B8924A" strokeWidth={2} />
+  if (value === 'opt') return <AlertTriangle size={16} color="#d97706" strokeWidth={2} />
   return <Minus size={14} color="rgba(122,118,112,0.4)" strokeWidth={2} />
 }
 
@@ -119,9 +125,9 @@ export default function Security() {
           </div>
           <div style={{ padding: '12px 24px', borderTop: '1px solid #E8E3D8', display: 'flex', flexWrap: 'wrap', gap: '8px 24px' }}>
             {[
-              { Icon: CheckCircle2,  color: '#B8924A', label: 'Built-in'      },
-              { Icon: AlertTriangle, color: '#d97706', label: 'Optional add-on' },
-              { Icon: Minus,         color: '#B8B3AA', label: 'Not available'  },
+              {Icon: CheckCircle2, color: '#B8924A', label: 'Built-in'},
+              {Icon: AlertTriangle, color: '#d97706', label: 'Optional add-on'},
+              {Icon: Minus, color: '#B8B3AA', label: 'Not available'},
             ].map(({ Icon, color, label }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Icon size={12} color={color} strokeWidth={2} />

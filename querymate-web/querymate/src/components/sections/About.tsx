@@ -4,10 +4,10 @@ import { Users, BarChart3, FileSearch, MessageSquare } from 'lucide-react'
 import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
 
 const USE_CASES = [
-  { Icon: Users,       title: 'Non-Technical Stakeholders', desc: 'Executives and analysts query databases directly in plain English — no SQL knowledge required at any level.' },
-  { Icon: BarChart3,   title: 'Business Intelligence',      desc: 'Rapid reporting and data exploration through a conversational interface that understands business context.' },
-  { Icon: FileSearch,  title: 'Data Exploration',           desc: 'Explore unfamiliar schemas quickly by asking natural questions about structure, relationships, and content.' },
-  { Icon: MessageSquare, title: 'Database Documentation',   desc: 'Understand database schemas through natural language queries rather than reading raw DDL definitions.' },
+  { Icon: Users, title: 'Non-Technical Stakeholders', desc: 'Executives and analysts query databases directly in plain English — no SQL knowledge required at any level.' },
+  { Icon: BarChart3, title: 'Business Intelligence', desc: 'Rapid reporting and data exploration through a conversational interface that understands business context.' },
+  { Icon: FileSearch, title: 'Data Exploration', desc: 'Explore unfamiliar schemas quickly by asking natural questions about structure, relationships, and content.' },
+  { Icon: MessageSquare, title: 'Database Documentation', desc: 'Understand database schemas through natural language queries rather than reading raw DDL definitions.' },
 ]
 
 export default function About() {

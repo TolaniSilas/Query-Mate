@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import { MessageSquare, Plus, Settings, FileText } from 'lucide-react'
 
@@ -149,7 +150,7 @@ export default function Sidebar() {
         <aside style={S.root}>
             <div style={S.top}>
                 {/* logo */}
-                <a href="/" style={S.logo}>QueryMate</a>
+                <Link href="/" style={S.logo}>QueryMate</Link>
 
                 {/* status */}
                 <div style={S.status}>

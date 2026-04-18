@@ -1,15 +1,16 @@
  'use client'
 
 import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
-import { Languages, Brain, RefreshCw, ShieldCheck, Database, Eye } from 'lucide-react'
+import { Languages, Shield, Brain, RefreshCw, ShieldCheck, Database, Eye } from 'lucide-react'
 
 const SERVICES = [
-  { Icon: Languages,   n: '01', title: 'Natural Language Translation',  tag: 'SQL Agent',       desc: 'The SQL Agent converts plain English questions into precise, dialect-specific SQL queries with full schema context. Supports PostgreSQL, MySQL, and SQLite syntax.' },
-  { Icon: Brain,       n: '02', title: 'LLM-Based Semantic Validation', tag: 'Validator Agent', desc: 'A dedicated Validator Agent evaluates generated SQL across five dimensions: semantic alignment, schema correctness, JOIN completeness, logic accuracy, and edge case handling.' },
-  { Icon: RefreshCw,   n: '03', title: 'Agentic Retry Loop',            tag: 'Pipeline',        desc: 'When validation fails, structured feedback passes back to the SQL Agent for targeted self-correction. The system retries up to three times without regenerating from scratch.' },
-  { Icon: ShieldCheck, n: '04', title: 'Layered Security Enforcement',  tag: 'Security',        desc: 'Two independent layers: a rule-based keyword scanner rejects non-SELECT queries, and read-only is enforced at the connection level before any LLM output can cause harm.' },
-  { Icon: Database,    n: '05', title: 'Schema Understanding via ORM',  tag: 'Schema Inspector', desc: 'SQLAlchemy inspects your database at connection time — capturing tables, columns, types, primary keys, foreign keys, and sample rows. Cached and injected into every agent call.' },
-  { Icon: Eye,         n: '06', title: 'Human-Readable Responses',      tag: 'Response Agent',  desc: 'The Response Agent synthesises raw query results into natural language insights — totals, trends, comparisons. Raw rows and SQL are never exposed to non-technical users.' },
+  { Icon: Languages, n: '01', title: 'Natural Language Translation', tag: 'SQL Agent', desc: 'The SQL Agent converts plain English questions into precise, dialect-specific SQL queries with full schema context. Supports PostgreSQL, MySQL, and SQLite syntax.' },
+  { Icon: Shield, n: '02', title: 'Guardrails', tag: 'Input Security', desc: 'Guardrails screen prompts for unsafe instructions, out-of-policy requests, and missing context before any downstream token generation begins, reducing risk and controlling LLM cost.' },
+  { Icon: Brain, n: '03', title: 'LLM-Based Semantic Validation', tag: 'Validator Agent', desc: 'A dedicated Validator Agent evaluates generated SQL across five dimensions: semantic alignment, schema correctness, JOIN completeness, logic accuracy, and edge case handling.' },
+  { Icon: RefreshCw, n: '04', title: 'Agentic Retry Loop', tag: 'Pipeline', desc: 'When validation fails, structured feedback passes back to the SQL Agent for targeted self-correction. The system retries up to three times without regenerating from scratch.' },
+  { Icon: ShieldCheck, n: '05', title: 'Layered Security Enforcement', tag: 'Security', desc: 'Two independent layers: a rule-based keyword scanner rejects non-SELECT queries, and read-only is enforced at the connection level before any LLM output can cause harm.' },
+  { Icon: Database, n: '06', title: 'Schema Understanding via ORM', tag: 'Schema Inspector', desc: 'SQLAlchemy inspects your database at connection time — capturing tables, columns, types, primary keys, foreign keys, and sample rows. Cached and injected into every agent call.' },
+  { Icon: Eye, n: '07', title: 'Human-Readable Responses', tag: 'Response Agent',  desc: 'The Response Agent synthesises raw query results into natural language insights — totals, trends, comparisons. Raw rows and SQL are never exposed to non-technical users.' },
 ]
 
 export default function Services() {
@@ -27,8 +28,8 @@ export default function Services() {
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#B8924A', textTransform: 'uppercase', letterSpacing: '0.15em' }}>What it does</span>
             </div>
             <h2 data-scroll-reveal className="scroll-reveal delay-200" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.05, color: '#F4F1EB', letterSpacing: '-0.02em' }}>
-              Six agents.
-              <br /><em style={{ color: '#B8924A' }}>One answer.</em>
+              Seven Steps - Security First.
+              <br /><em style={{ color: '#B8924A' }}>One Answer.</em>
             </h2>
           </div>
           <p data-scroll-reveal className="scroll-reveal delay-300" style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'rgba(244,241,235,0.4)', maxWidth: 320, lineHeight: 1.7 }}>

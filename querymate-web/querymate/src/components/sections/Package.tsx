@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Database, Terminal, ShieldCheck, Box } from 'lucide-react'
 import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
 
@@ -18,7 +19,7 @@ export default function Package() {
                             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#B8924A', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Developer Package</span>
                         </div>
                         <h2 data-scroll-reveal className="scroll-reveal delay-200" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 400, color: '#0D0D0D', marginBottom: 24, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                            Powerful Python Library <br />
+                            Secured Python Library <br />
                             <em style={{ fontStyle: 'italic' }}>for Your Backend</em>
                         </h2>
                         <p data-scroll-reveal className="scroll-reveal delay-300" style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#7A7670', lineHeight: 1.7, marginBottom: 32 }}>
@@ -36,32 +37,64 @@ export default function Package() {
                             </div>
                         </div>
 
-                        <a
-                            href=""
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            data-scroll-reveal
-                            className={"font-space scroll-reveal delay-500"}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 10,
-                                fontSize: 14,
-                                fontWeight: 600,
-                                backgroundColor: '#0D0D0D',
-                                color: '#F4F1EB',
-                                padding: '12px 24px',
-                                borderRadius: 4,
-                                textDecoration: 'none',
-                                transition: 'all 0.2s',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#2a2a2a' }}
-                            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#0D0D0D' }}
-                        >
-                            <Box size={16} />
-                            View on PyPI
-                        </a>
+                        <div data-scroll-reveal className="scroll-reveal delay-500" style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                            <a
+                                href="https://pypi.org/project/query-mate/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-space"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 10,
+                                    fontSize: 14,
+                                    fontWeight: 600,
+                                    backgroundColor: '#0D0D0D',
+                                    color: '#F4F1EB',
+                                    padding: '12px 24px',
+                                    borderRadius: 4,
+                                    textDecoration: 'none',
+                                    transition: 'all 0.2s',
+                                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#2a2a2a' }}
+                                onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#0D0D0D' }}
+                            >
+                                <Box size={16} />
+                                View on PyPI
+                            </a>
+
+                            <Link
+                                href="/docs"
+                                className="font-space"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 10,
+                                    fontSize: 14,
+                                    fontWeight: 600,
+                                    backgroundColor: '#F4F1EB',
+                                    color: '#0D0D0D',
+                                    padding: '12px 24px',
+                                    borderRadius: 4,
+                                    textDecoration: 'none',
+                                    transition: 'all 0.2s',
+                                    border: '1px solid #E8E3D8',
+                                    boxShadow: '0 10px 30px rgba(184,146,74,0.08)'
+                                }}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.backgroundColor = '#EFE7D8'
+                                    e.currentTarget.style.borderColor = '#D9CDB8'
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.backgroundColor = '#F4F1EB'
+                                    e.currentTarget.style.borderColor = '#E8E3D8'
+                                }}
+                            >
+                                <Database size={16} />
+                                Read the Docs
+                            </Link>
+                        </div>
                     </div>
 
                     <div data-scroll-reveal className="scroll-reveal delay-600" style={{ display: 'flex', justifyContent: 'center' }}>

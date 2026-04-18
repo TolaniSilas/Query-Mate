@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Database, FolderOpen, Lock, ChevronRight, AlertCircle } from 'lucide-react'
@@ -179,7 +180,7 @@ export default function ConnectForm() {
     return (
         <div style={C.root}>
             {/* logo */}
-            <a href="/" style={C.logo}>QueryMate</a>
+            <Link href="/" style={C.logo}>QueryMate</Link>
 
             <div style={C.card}>
                 {/* step indicator */}
