@@ -1,7 +1,8 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowDown, Terminal, Shield, Zap, Database, MousePointer2, ArrowRight } from 'lucide-react'
+import { ArrowDown, Terminal, Shield, Database } from 'lucide-react'
 
 export default function Hero() {
   return (
@@ -151,9 +152,12 @@ export default function Hero() {
                 e.currentTarget.style.boxShadow = '0 80px 150px rgba(0,0,0,0.3), 0 0 100px rgba(184, 146, 74, 0.1)';
               }}
             >
-              <img
+              <Image
                 src="/images/hero_chat_preview_image.png"
                 alt="QueryMate Dashboard Preview"
+                width={1600}
+                height={1280}
+                sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ width: '100%', height: 'auto', display: 'block' }}
               />
             </div>

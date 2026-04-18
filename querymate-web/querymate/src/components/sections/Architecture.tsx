@@ -4,12 +4,13 @@ import { ArrowRight } from 'lucide-react'
 import { useScrollReveal } from '@/src/components/utils/useScrollReveal'
 
 const STEPS = [
-  { n: '01', label: 'User Question',      desc: 'Plain English submitted through the interface or SDK',                        dark: false },
-  { n: '02', label: 'SQL Agent',          desc: 'NL to SQL with schema context. Retries with targeted feedback on rejection.',  dark: true  },
-  { n: '03', label: 'Validator Agent',    desc: 'LLM semantic gate — checks intent, schema correctness, JOINs, logic.',        dark: true  },
-  { n: '04', label: 'Security Gate',      desc: 'Rule-based scanner rejects any non-SELECT before reaching the database.',     dark: false },
-  { n: '05', label: 'DB Execution',       desc: 'Read-only query runs on the connected engine via SQLAlchemy.',                dark: false },
-  { n: '06', label: 'Response Agent',     desc: 'Synthesises results into natural language. No rows or SQL exposed.',          dark: true  },
+  { n: '01', label: 'User Question', desc: 'A natural-language question enters through the web app or API.', dark: false },
+  { n: '02', label: 'Guardrails', desc: 'Input rules screen for unsafe instructions, unsupported requests, and missing context before SQL is generated.', dark: false },
+  { n: '03', label: 'SQL Agent', desc: 'The model generates dialect-aware SQL using schema context, table relationships, and the user intent.', dark: true },
+  { n: '04', label: 'Validator Agent', desc: 'A second pass checks semantic fit, schema alignment, joins, filters, and whether the query actually answers the question.', dark: true },
+  { n: '05', label: 'Security Gate', desc: 'Deterministic checks block non-SELECT statements, dangerous patterns, and anything outside the read-only policy.', dark: false },
+  { n: '06', label: 'DB Execution', desc: 'Only approved SQL executes against the connected database in a read-only session.', dark: false },
+  { n: '07', label: 'Response Agent', desc: 'Structured results are translated into a concise answer with business-facing wording and no hidden side effects.', dark: true },
 ]
 
 const LAYERS = [
@@ -19,7 +20,7 @@ const LAYERS = [
   },
   {
     label: 'Application Layer',
-    items: ['Keyword token scanning', 'SQL comment stripping', 'Dangerous function blocking'],
+    items: ['Guardrails for unsafe prompts and out-of-policy requests', 'Keyword token scanning', 'SQL comment stripping', 'Dangerous function blocking'],
   },
   {
     label: 'Agent Layer',
@@ -88,7 +89,7 @@ export default function Architecture() {
         <div data-scroll-reveal className="scroll-reveal delay-600" style={{ border: '1px solid #E8E3D8', borderRadius: 3, overflow: 'hidden', marginBottom: 32 }}>
           <div style={{ padding: '14px 24px', borderBottom: '1px solid #E8E3D8', backgroundColor: '#EFECEA' }}>
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#7A7670', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-              Read-Only Security Layers
+              Security Layers
             </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', borderTop: 'none' }}>

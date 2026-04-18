@@ -1,32 +1,33 @@
- 'use client'
+'use client'
 
+import Link from 'next/link'
 import { Database, Package, BookOpen, ArrowUpRight } from 'lucide-react'
 
 const COLS = [
   {
     heading: 'Product',
     links: [
-      { label: 'About',        href: '#about'        },
-      { label: 'Services',     href: '#services'     },
-      { label: 'Architecture', href: '#architecture' },
-      { label: 'Security',     href: '#security'     },
+      { label: 'About', href: '/#about'        },
+      { label: 'Services', href: '/#services'     },
+      { label: 'Architecture', href: '/#architecture' },
+      { label: 'Security', href: '/#security'     },
     ],
   },
   {
     heading: 'Developers',
     links: [
-      { label: 'Documentation', href: '#', ext: true },
-      { label: 'PyPI Package',  href: '#package', ext: false },
-      // { label: 'GitHub',        href: '#', ext: true },
-      { label: 'Changelog',     href: '#', ext: true },
+      { label: 'Documentation', href: '/docs', ext: false },
+      { label: 'PyPI Package', href: '/#package', ext: false },
+      // { label: 'GitHub', href: '#', ext: true },
+      { label: 'Changelog', href: '#', ext: true },
     ],
   },
   {
     heading: 'Databases',
     links: [
       { label: 'PostgreSQL', href: '#' },
-      { label: 'MySQL',      href: '#' },
-      { label: 'SQLite',     href: '#' },
+      { label: 'MySQL', href: '#' },
+      { label: 'SQLite', href: '#' },
     ],
   },
 ]
@@ -53,19 +54,34 @@ export default function Footer() {
             <div style={{ display: 'flex', gap: 16 }}>
               {[
                 // { Icon: Github,   label: 'GitHub',        href: '#' },
-                { Icon: Package,  label: 'PyPI',          href: '#' },
-                { Icon: BookOpen, label: 'Documentation', href: '#' },
+                { Icon: Package,  label: 'PyPI',          href: 'https://pypi.org/project/query-mate/' },
+                { Icon: BookOpen, label: 'Documentation', href: '/docs' },
               ].map(({ Icon, label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  style={{ color: 'rgba(244,241,235,0.35)', transition: 'color 0.2s', display: 'flex' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#B8924A')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(244,241,235,0.35)')}
-                >
-                  <Icon size={17} />
-                </a>
+                href.startsWith('http') ? (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    style={{ color: 'rgba(244,241,235,0.35)', transition: 'color 0.2s', display: 'flex' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#B8924A')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(244,241,235,0.35)')}
+                  >
+                    <Icon size={17} />
+                  </a>
+                ) : (
+                  <Link
+                    key={label}
+                    href={href}
+                    aria-label={label}
+                    style={{ color: 'rgba(244,241,235,0.35)', transition: 'color 0.2s', display: 'flex' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#B8924A')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(244,241,235,0.35)')}
+                  >
+                    <Icon size={17} />
+                  </Link>
+                )
               ))}
             </div>
           </div>
@@ -79,17 +95,28 @@ export default function Footer() {
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {col.links.map(link => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      target={(link as { ext?: boolean }).ext ? '_blank' : undefined}
-                      rel={(link as { ext?: boolean }).ext ? 'noopener noreferrer' : undefined}
-                      style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'rgba(244,241,235,0.45)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, transition: 'color 0.2s' }}
-                      onMouseEnter={e => (e.currentTarget.style.color = '#F4F1EB')}
-                      onMouseLeave={e => (e.currentTarget.style.color = 'rgba(244,241,235,0.45)')}
-                    >
-                      {link.label}
-                      {(link as { ext?: boolean }).ext && <ArrowUpRight size={11} />}
-                    </a>
+                    {(link as { ext?: boolean }).ext ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'rgba(244,241,235,0.45)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, transition: 'color 0.2s' }}
+                        onMouseEnter={e => (e.currentTarget.style.color = '#F4F1EB')}
+                        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(244,241,235,0.45)')}
+                      >
+                        {link.label}
+                        <ArrowUpRight size={11} />
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'rgba(244,241,235,0.45)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, transition: 'color 0.2s' }}
+                        onMouseEnter={e => (e.currentTarget.style.color = '#F4F1EB')}
+                        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(244,241,235,0.45)')}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
