@@ -1,9 +1,28 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+
 [project]
-name = "query-mate"
+name = "querymate-sdk"
 version = "0.1.0"
-description = "Add your description here"
+description = "A security-first in mind and at design, natural language Python package and interface for querying large relational databases. Supports MySQL, PostgreSQL, and SQLite."
 readme = "README.md"
+authors = [
+  { name = "Silas Osunba", email = "osunbasilas@gmail.com" },
+  ]
 requires-python = ">=3.10"
+classifiers = [
+  "Operating System :: OS Independent",
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Database",
+  "License :: OSI Approved :: MIT License"
+]
 dependencies = [
     "anthropic>=0.84.0",
     "fastapi>=0.135.1",
@@ -17,4 +36,23 @@ dependencies = [
     "redis>=5.0.0",
     "sqlalchemy>=2.0.48",
     "sqlglot>=29.0.1",
+]
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["querymate"]
+
+
+[tool.hatch.build.targets.sdist]
+include = ["querymate/**", "README.md", "LICENSE"]
+exclude = [
+  "img-pkg/**",
+  "querymate-web/**",
+  "serving/**",
+  "tests/**",
+  ".venv/**",
+  "__pycache__/**",
+  "*.png",
+  "*.jpg",
+  "*.jpeg"
 ]

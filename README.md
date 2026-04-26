@@ -1,5 +1,5 @@
 # Query Mate: Chat With Your Database
-**TL, DR:** A **Secure** Retrieval-Augmented Text-to-SQL System for Large Relational Databases.
+**TL, DR:** A **Secure** Text-to-SQL System for Large Relational Databases.
 
 
 Most agentic AI frameworks, such as **LlamaIndex**, **CrewAI**, and **LangChain**, provide natural language querying capabilities via or help of tools calls, that translate questions into SQL and return responses in human-readable formats. However, these frameworks also leave room for a series of gaps that require urgent, meticulous, and painstaking solutions. They are not designed with security in mind, at heart, or at their core — and relational database systems contain sensitive information that must be protected, with rigorous security measures applied accordingly.
